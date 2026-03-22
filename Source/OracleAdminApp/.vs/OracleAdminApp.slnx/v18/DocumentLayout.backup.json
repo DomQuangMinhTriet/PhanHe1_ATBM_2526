@@ -3,28 +3,28 @@
   "WorkspaceRootPath": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|e:\\phanhe1_atbm_2526\\source\\oracleadminapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F2CDD27-AC6E-476A-887A-EE0A9A4167A9}|OracleAdminApp.csproj|solutionrelative:databasehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,11 +34,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "DatabaseHelper.cs",
               "DocumentMoniker": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\DatabaseHelper.cs",
               "RelativeDocumentMoniker": "DatabaseHelper.cs",
@@ -52,7 +52,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -66,19 +66,6 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Form1.cs",
-              "RelativeDocumentMoniker": "Form1.cs",
-              "ToolTip": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Form1.cs [Design]",
-              "RelativeToolTip": "Form1.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-22T03:40:27.257Z",
-              "IsPinned": true,
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
               "Title": "LoginForm.cs [Design]",
               "DocumentMoniker": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\LoginForm.cs",
@@ -86,8 +73,19 @@
               "ToolTip": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\LoginForm.cs [Design]",
               "RelativeToolTip": "LoginForm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-22T03:29:36.465Z",
-              "IsPinned": true,
+              "WhenOpened": "2026-03-22T05:07:31.546Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Form1.cs [Design]",
+              "RelativeToolTip": "Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T05:07:24.613Z",
               "EditorCaption": " [Design]"
             },
             {
@@ -98,20 +96,20 @@
               "RelativeDocumentMoniker": "LoginForm.cs",
               "ToolTip": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\LoginForm.cs",
               "RelativeToolTip": "LoginForm.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-22T04:21:01.359Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Form1.cs",
               "DocumentMoniker": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "E:\\PhanHe1_ATBM_2526\\Source\\OracleAdminApp\\Form1.cs",
               "RelativeToolTip": "Form1.cs",
-              "ViewState": "AgIAANUBAAAAAAAAAAAEwOQBAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAABoDAAAAAAAAAAAqwEwDAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-22T03:00:38.322Z",
               "EditorCaption": ""

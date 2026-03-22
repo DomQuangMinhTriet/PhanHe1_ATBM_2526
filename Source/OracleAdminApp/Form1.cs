@@ -26,6 +26,8 @@ namespace OracleSecurityAdmin
         private ComboBox cboType;
 
         // === CÁC BIẾN MỚI THÊM CHO TAB 2 (GRANT/REVOKE) ===
+        private Label lblGranteeType;  // MỚI THÊM: Nhãn cho Loại Grantee
+        private ComboBox cboGranteeType; // MỚI THÊM: Ô chọn Loại (User/Role)
         private Label lblGrantee;
         private ComboBox cboGrantee;
         private Button btnViewPrivs;
@@ -42,6 +44,11 @@ namespace OracleSecurityAdmin
         private Button btnGrantPriv;
         private Button btnRevokePriv;
 
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
         // Constructor nhận tham số từ LoginForm
         public Form1(string host, string port, string serviceName, string username, string password)
         {
@@ -57,7 +64,6 @@ namespace OracleSecurityAdmin
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabUserRole = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.btnLogout = new System.Windows.Forms.Button();
             this.lblName = new System.Windows.Forms.Label();
             this.lblPassword = new System.Windows.Forms.Label();
@@ -70,8 +76,12 @@ namespace OracleSecurityAdmin
             this.txtTen = new System.Windows.Forms.TextBox();
             this.dgvList = new System.Windows.Forms.DataGridView();
             this.cboType = new System.Windows.Forms.ComboBox();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
 
-            // === KHỞI TẠO CÁC CONTROL CHO TAB 2 ===
+            // Khởi tạo biến mới
+            this.lblGranteeType = new System.Windows.Forms.Label();
+            this.cboGranteeType = new System.Windows.Forms.ComboBox();
+
             this.lblGrantee = new System.Windows.Forms.Label();
             this.cboGrantee = new System.Windows.Forms.ComboBox();
             this.btnViewPrivs = new System.Windows.Forms.Button();
@@ -87,7 +97,6 @@ namespace OracleSecurityAdmin
             this.chkWithGrantOption = new System.Windows.Forms.CheckBox();
             this.btnGrantPriv = new System.Windows.Forms.Button();
             this.btnRevokePriv = new System.Windows.Forms.Button();
-
             this.tabControl1.SuspendLayout();
             this.tabUserRole.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvList)).BeginInit();
@@ -151,9 +160,9 @@ namespace OracleSecurityAdmin
             this.lblPassword.AutoSize = true;
             this.lblPassword.Location = new System.Drawing.Point(8, 246);
             this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(92, 13);
+            this.lblPassword.Size = new System.Drawing.Size(59, 13);
             this.lblPassword.TabIndex = 21;
-            this.lblPassword.Text = "Password (if User)";
+            this.lblPassword.Text = "Password: ";
             // 
             // lblChoose
             // 
@@ -236,11 +245,11 @@ namespace OracleSecurityAdmin
             this.cboType.Name = "cboType";
             this.cboType.Size = new System.Drawing.Size(121, 21);
             this.cboType.TabIndex = 12;
-
-            // ================== THIẾT KẾ TAB 2 (GRANT/REVOKE) ==================
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.lblGranteeType);
+            this.tabPage2.Controls.Add(this.cboGranteeType);
             this.tabPage2.Controls.Add(this.lblGrantee);
             this.tabPage2.Controls.Add(this.cboGrantee);
             this.tabPage2.Controls.Add(this.btnViewPrivs);
@@ -263,116 +272,170 @@ namespace OracleSecurityAdmin
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Grant/Revoke";
             this.tabPage2.UseVisualStyleBackColor = true;
-
+            // 
+            // lblGranteeType (MỚI)
+            // 
+            this.lblGranteeType.AutoSize = true;
+            this.lblGranteeType.Location = new System.Drawing.Point(10, 15);
+            this.lblGranteeType.Name = "lblGranteeType";
+            this.lblGranteeType.Size = new System.Drawing.Size(34, 13);
+            this.lblGranteeType.TabIndex = 15;
+            this.lblGranteeType.Text = "Type:";
+            // 
+            // cboGranteeType (MỚI)
+            // 
+            this.cboGranteeType.FormattingEnabled = true;
+            this.cboGranteeType.Items.AddRange(new object[] { "User", "Role" });
+            this.cboGranteeType.Location = new System.Drawing.Point(13, 35);
+            this.cboGranteeType.Name = "cboGranteeType";
+            this.cboGranteeType.Size = new System.Drawing.Size(70, 21);
+            this.cboGranteeType.TabIndex = 16;
+            this.cboGranteeType.SelectedIndexChanged += new System.EventHandler(this.cboGranteeType_SelectedIndexChanged);
+            // 
             // lblGrantee
+            // 
             this.lblGrantee.AutoSize = true;
-            this.lblGrantee.Location = new System.Drawing.Point(10, 15);
+            this.lblGrantee.Location = new System.Drawing.Point(90, 15);
             this.lblGrantee.Name = "lblGrantee";
-            this.lblGrantee.Size = new System.Drawing.Size(130, 13);
+            this.lblGrantee.Size = new System.Drawing.Size(139, 13);
+            this.lblGrantee.TabIndex = 0;
             this.lblGrantee.Text = "Select User/Role (Grantee):";
-
+            // 
             // cboGrantee
+            // 
             this.cboGrantee.FormattingEnabled = true;
-            this.cboGrantee.Location = new System.Drawing.Point(13, 35);
+            this.cboGrantee.Location = new System.Drawing.Point(93, 35);
             this.cboGrantee.Name = "cboGrantee";
-            this.cboGrantee.Size = new System.Drawing.Size(180, 21);
-
+            this.cboGrantee.Size = new System.Drawing.Size(110, 21);
+            this.cboGrantee.TabIndex = 1;
+            // 
             // btnViewPrivs
+            // 
             this.btnViewPrivs.Location = new System.Drawing.Point(210, 33);
             this.btnViewPrivs.Name = "btnViewPrivs";
             this.btnViewPrivs.Size = new System.Drawing.Size(100, 25);
+            this.btnViewPrivs.TabIndex = 2;
             this.btnViewPrivs.Text = "View Privs";
             this.btnViewPrivs.UseVisualStyleBackColor = true;
             this.btnViewPrivs.Click += new System.EventHandler(this.btnViewPrivs_Click);
-
-            // lblObjectType
-            this.lblObjectType.AutoSize = true;
-            this.lblObjectType.Location = new System.Drawing.Point(10, 75);
-            this.lblObjectType.Name = "lblObjectType";
-            this.lblObjectType.Size = new System.Drawing.Size(68, 13);
-            this.lblObjectType.Text = "Object Type:";
-
-            // cboObjectType
-            this.cboObjectType.FormattingEnabled = true;
-            this.cboObjectType.Items.AddRange(new object[] { "TABLE", "VIEW", "PROCEDURE", "FUNCTION" });
-            this.cboObjectType.Location = new System.Drawing.Point(13, 95);
-            this.cboObjectType.Name = "cboObjectType";
-            this.cboObjectType.Size = new System.Drawing.Size(130, 21);
-            this.cboObjectType.SelectedIndexChanged += new System.EventHandler(this.cboObjectType_SelectedIndexChanged);
-
-            // lblObjectName
-            this.lblObjectName.AutoSize = true;
-            this.lblObjectName.Location = new System.Drawing.Point(160, 75);
-            this.lblObjectName.Name = "lblObjectName";
-            this.lblObjectName.Size = new System.Drawing.Size(72, 13);
-            this.lblObjectName.Text = "Object Name:";
-
-            // cboObjectName
-            this.cboObjectName.FormattingEnabled = true;
-            this.cboObjectName.Location = new System.Drawing.Point(163, 95);
-            this.cboObjectName.Name = "cboObjectName";
-            this.cboObjectName.Size = new System.Drawing.Size(170, 21);
-            this.cboObjectName.SelectedIndexChanged += new System.EventHandler(this.cboObjectName_SelectedIndexChanged);
-
-            // lblPrivs
-            this.lblPrivs.AutoSize = true;
-            this.lblPrivs.Location = new System.Drawing.Point(10, 135);
-            this.lblPrivs.Name = "lblPrivs";
-            this.lblPrivs.Size = new System.Drawing.Size(55, 13);
-            this.lblPrivs.Text = "Privileges:";
-
-            // clbPrivs
-            this.clbPrivs.FormattingEnabled = true;
-            this.clbPrivs.Location = new System.Drawing.Point(13, 155);
-            this.clbPrivs.Name = "clbPrivs";
-            this.clbPrivs.Size = new System.Drawing.Size(130, 94);
-
-            // lblColumns
-            this.lblColumns.AutoSize = true;
-            this.lblColumns.Location = new System.Drawing.Point(160, 135);
-            this.lblColumns.Name = "lblColumns";
-            this.lblColumns.Size = new System.Drawing.Size(141, 13);
-            this.lblColumns.Text = "Columns (for Select/Update):";
-
-            // clbColumns
-            this.clbColumns.FormattingEnabled = true;
-            this.clbColumns.Location = new System.Drawing.Point(163, 155);
-            this.clbColumns.Name = "clbColumns";
-            this.clbColumns.Size = new System.Drawing.Size(170, 94);
-
-            // chkWithGrantOption
-            this.chkWithGrantOption.AutoSize = true;
-            this.chkWithGrantOption.Location = new System.Drawing.Point(13, 270);
-            this.chkWithGrantOption.Name = "chkWithGrantOption";
-            this.chkWithGrantOption.Size = new System.Drawing.Size(134, 17);
-            this.chkWithGrantOption.Text = "WITH GRANT OPTION";
-            this.chkWithGrantOption.UseVisualStyleBackColor = true;
-
-            // btnGrantPriv
-            this.btnGrantPriv.Location = new System.Drawing.Point(13, 305);
-            this.btnGrantPriv.Name = "btnGrantPriv";
-            this.btnGrantPriv.Size = new System.Drawing.Size(130, 30);
-            this.btnGrantPriv.BackColor = Color.LightGreen;
-            this.btnGrantPriv.Text = "GRANT";
-            this.btnGrantPriv.UseVisualStyleBackColor = false;
-            this.btnGrantPriv.Click += new System.EventHandler(this.btnGrantPriv_Click);
-
-            // btnRevokePriv
-            this.btnRevokePriv.Location = new System.Drawing.Point(163, 305);
-            this.btnRevokePriv.Name = "btnRevokePriv";
-            this.btnRevokePriv.Size = new System.Drawing.Size(130, 30);
-            this.btnRevokePriv.BackColor = Color.LightCoral;
-            this.btnRevokePriv.Text = "REVOKE";
-            this.btnRevokePriv.UseVisualStyleBackColor = false;
-            this.btnRevokePriv.Click += new System.EventHandler(this.btnRevokePriv_Click);
-
+            // 
             // dgvPrivs
+            // 
             this.dgvPrivs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPrivs.Location = new System.Drawing.Point(360, 15);
             this.dgvPrivs.Name = "dgvPrivs";
             this.dgvPrivs.Size = new System.Drawing.Size(425, 395);
-            // ===================================================================
-
+            this.dgvPrivs.TabIndex = 3;
+            // 
+            // lblObjectType
+            // 
+            this.lblObjectType.AutoSize = true;
+            this.lblObjectType.Location = new System.Drawing.Point(10, 75);
+            this.lblObjectType.Name = "lblObjectType";
+            this.lblObjectType.Size = new System.Drawing.Size(68, 13);
+            this.lblObjectType.TabIndex = 4;
+            this.lblObjectType.Text = "Object Type:";
+            // 
+            // cboObjectType
+            // 
+            this.cboObjectType.FormattingEnabled = true;
+            // ĐÃ THÊM "ROLE" VÀO Items
+            this.cboObjectType.Items.AddRange(new object[] {
+            "TABLE",
+            "VIEW",
+            "PROCEDURE",
+            "FUNCTION",
+            "ROLE"});
+            this.cboObjectType.Location = new System.Drawing.Point(13, 95);
+            this.cboObjectType.Name = "cboObjectType";
+            this.cboObjectType.Size = new System.Drawing.Size(130, 21);
+            this.cboObjectType.TabIndex = 5;
+            this.cboObjectType.SelectedIndexChanged += new System.EventHandler(this.cboObjectType_SelectedIndexChanged);
+            // 
+            // lblObjectName
+            // 
+            this.lblObjectName.AutoSize = true;
+            this.lblObjectName.Location = new System.Drawing.Point(160, 75);
+            this.lblObjectName.Name = "lblObjectName";
+            this.lblObjectName.Size = new System.Drawing.Size(72, 13);
+            this.lblObjectName.TabIndex = 6;
+            this.lblObjectName.Text = "Object Name:";
+            // 
+            // cboObjectName
+            // 
+            this.cboObjectName.FormattingEnabled = true;
+            this.cboObjectName.Location = new System.Drawing.Point(163, 95);
+            this.cboObjectName.Name = "cboObjectName";
+            this.cboObjectName.Size = new System.Drawing.Size(170, 21);
+            this.cboObjectName.TabIndex = 7;
+            this.cboObjectName.SelectedIndexChanged += new System.EventHandler(this.cboObjectName_SelectedIndexChanged);
+            // 
+            // lblPrivs
+            // 
+            this.lblPrivs.AutoSize = true;
+            this.lblPrivs.Location = new System.Drawing.Point(10, 135);
+            this.lblPrivs.Name = "lblPrivs";
+            this.lblPrivs.Size = new System.Drawing.Size(55, 13);
+            this.lblPrivs.TabIndex = 8;
+            this.lblPrivs.Text = "Privileges:";
+            // 
+            // clbPrivs
+            // 
+            this.clbPrivs.FormattingEnabled = true;
+            this.clbPrivs.Location = new System.Drawing.Point(13, 155);
+            this.clbPrivs.Name = "clbPrivs";
+            this.clbPrivs.Size = new System.Drawing.Size(130, 94);
+            this.clbPrivs.TabIndex = 9;
+            // 
+            // lblColumns
+            // 
+            this.lblColumns.AutoSize = true;
+            this.lblColumns.Location = new System.Drawing.Point(160, 135);
+            this.lblColumns.Name = "lblColumns";
+            this.lblColumns.Size = new System.Drawing.Size(144, 13);
+            this.lblColumns.TabIndex = 10;
+            this.lblColumns.Text = "Columns (for Select/Update):";
+            // 
+            // clbColumns
+            // 
+            this.clbColumns.FormattingEnabled = true;
+            this.clbColumns.Location = new System.Drawing.Point(163, 155);
+            this.clbColumns.Name = "clbColumns";
+            this.clbColumns.Size = new System.Drawing.Size(170, 94);
+            this.clbColumns.TabIndex = 11;
+            // 
+            // chkWithGrantOption
+            // 
+            this.chkWithGrantOption.AutoSize = true;
+            this.chkWithGrantOption.Location = new System.Drawing.Point(13, 270);
+            this.chkWithGrantOption.Name = "chkWithGrantOption";
+            this.chkWithGrantOption.Size = new System.Drawing.Size(193, 17);
+            this.chkWithGrantOption.TabIndex = 12;
+            // CẬP NHẬT TÊN ĐỂ PHÙ HỢP VỚI CẢ ADMIN OPTION CỦA ROLE
+            this.chkWithGrantOption.Text = "WITH GRANT/ADMIN OPTION";
+            this.chkWithGrantOption.UseVisualStyleBackColor = true;
+            // 
+            // btnGrantPriv
+            // 
+            this.btnGrantPriv.BackColor = System.Drawing.Color.LightGreen;
+            this.btnGrantPriv.Location = new System.Drawing.Point(13, 305);
+            this.btnGrantPriv.Name = "btnGrantPriv";
+            this.btnGrantPriv.Size = new System.Drawing.Size(130, 30);
+            this.btnGrantPriv.TabIndex = 13;
+            this.btnGrantPriv.Text = "GRANT";
+            this.btnGrantPriv.UseVisualStyleBackColor = false;
+            this.btnGrantPriv.Click += new System.EventHandler(this.btnGrantPriv_Click);
+            // 
+            // btnRevokePriv
+            // 
+            this.btnRevokePriv.BackColor = System.Drawing.Color.LightCoral;
+            this.btnRevokePriv.Location = new System.Drawing.Point(163, 305);
+            this.btnRevokePriv.Name = "btnRevokePriv";
+            this.btnRevokePriv.Size = new System.Drawing.Size(130, 30);
+            this.btnRevokePriv.TabIndex = 14;
+            this.btnRevokePriv.Text = "REVOKE";
+            this.btnRevokePriv.UseVisualStyleBackColor = false;
+            this.btnRevokePriv.Click += new System.EventHandler(this.btnRevokePriv_Click);
             // 
             // Form1
             // 
@@ -389,6 +452,7 @@ namespace OracleSecurityAdmin
             this.tabPage2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPrivs)).EndInit();
             this.ResumeLayout(false);
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -454,8 +518,6 @@ namespace OracleSecurityAdmin
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
             string query = "";
 
-            //if (!ten.StartsWith("C##")) ten = "C##" + ten;
-
             if (loai == "User")
             {
                 if (string.IsNullOrEmpty(matKhau))
@@ -491,8 +553,6 @@ namespace OracleSecurityAdmin
                 return;
             }
 
-            //if (!ten.StartsWith("C##")) ten = "C##" + ten;
-
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
             string query = loai == "User" ? $"DROP USER {ten} CASCADE" : $"DROP ROLE {ten}";
@@ -523,8 +583,6 @@ namespace OracleSecurityAdmin
                 return;
             }
 
-            //if (!ten.StartsWith("C##")) ten = "C##" + ten;
-
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
             string query = "";
@@ -553,21 +611,38 @@ namespace OracleSecurityAdmin
 
         // ========================== CÁC HÀM MỚI THÊM CHO LOGIC TAB 2 ==========================
 
-        // 1. Nạp danh sách User/Role vào ComboBox Grantee
-        private void LoadGranteesTab2()
+        // 1. MỚI THÊM: Sự kiện khi đổi loại Grantee (User hoặc Role)
+        private void cboGranteeType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            cboGrantee.Items.Clear();
+            string type = cboGranteeType.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(type)) return;
+
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
 
-            DataTable dtUsers = db.ExecuteQuery("SELECT USERNAME FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N'");
-            DataTable dtRoles = db.ExecuteQuery("SELECT ROLE FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'");
+            string query = type == "User" ? "SELECT USERNAME AS NAME FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N'"
+                                          : "SELECT ROLE AS NAME FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'";
 
-            cboGrantee.Items.Clear();
-            if (dtUsers != null) foreach (DataRow row in dtUsers.Rows) cboGrantee.Items.Add(row["USERNAME"].ToString());
-            if (dtRoles != null) foreach (DataRow row in dtRoles.Rows) cboGrantee.Items.Add(row["ROLE"].ToString());
+            DataTable dt = db.ExecuteQuery(query);
+            if (dt != null)
+            {
+                foreach (DataRow row in dt.Rows) cboGrantee.Items.Add(row["NAME"].ToString());
+            }
+            if (cboGrantee.Items.Count > 0) cboGrantee.SelectedIndex = 0;
         }
 
-        // 2. Load Danh sách Quyền và Tên Đối tượng khi người dùng đổi Loại đối tượng
+        // Nạp danh sách User/Role vào ComboBox Grantee
+        private void LoadGranteesTab2()
+        {
+            // Tự động kích hoạt chọn "User" đầu tiên để load danh sách
+            if (cboGranteeType.Items.Count > 0 && cboGranteeType.SelectedIndex == -1)
+                cboGranteeType.SelectedIndex = 0;
+            else
+                cboGranteeType_SelectedIndexChanged(null, null);
+        }
+
+        // 2. CẬP NHẬT: Load Danh sách Quyền và Tên Đối tượng khi người dùng đổi Loại đối tượng
         private void cboObjectType_SelectedIndexChanged(object sender, EventArgs e)
         {
             string objType = cboObjectType.SelectedItem?.ToString();
@@ -575,21 +650,26 @@ namespace OracleSecurityAdmin
 
             clbPrivs.Items.Clear();
             clbColumns.Items.Clear();
+            string query = "";
 
             if (objType == "TABLE" || objType == "VIEW")
             {
                 clbPrivs.Items.AddRange(new string[] { "SELECT", "INSERT", "UPDATE", "DELETE" });
+                query = $"SELECT OWNER || '.' || OBJECT_NAME AS FULL_OBJ_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE = '{objType}' AND ORACLE_MAINTAINED = 'N'";
             }
             else if (objType == "PROCEDURE" || objType == "FUNCTION")
             {
                 clbPrivs.Items.AddRange(new string[] { "EXECUTE" });
+                query = $"SELECT OWNER || '.' || OBJECT_NAME AS FULL_OBJ_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE = '{objType}' AND ORACLE_MAINTAINED = 'N'";
+            }
+            else if (objType == "ROLE") // MỚI THÊM: Nếu đối tượng là ROLE
+            {
+                // Không thêm đặc quyền gì vì Role gán nguyên cục
+                query = $"SELECT ROLE AS FULL_OBJ_NAME FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'";
             }
 
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-
-            // Lấy các đối tượng thuộc các schema không phải của hệ thống
-            string query = $"SELECT OWNER || '.' || OBJECT_NAME AS FULL_OBJ_NAME FROM DBA_OBJECTS WHERE OBJECT_TYPE = '{objType}' AND ORACLE_MAINTAINED = 'N'";
             DataTable dt = db.ExecuteQuery(query);
 
             cboObjectName.Items.Clear();
@@ -599,7 +679,7 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // 3. Load Danh sách cột khi chọn Table/View
+        // 3. Load Danh sách cột khi chọn Table/View (Giữ Nguyên)
         private void cboObjectName_SelectedIndexChanged(object sender, EventArgs e)
         {
             string objType = cboObjectType.SelectedItem?.ToString();
@@ -627,7 +707,7 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // 4. Xem quyền đang có của User/Role
+        // 4. CẬP NHẬT: Xem quyền đang có của User/Role (Thêm hiển thị Role)
         private void btnViewPrivs_Click(object sender, EventArgs e)
         {
             string grantee = cboGrantee.SelectedItem?.ToString();
@@ -642,9 +722,11 @@ namespace OracleSecurityAdmin
 
             string queryObjPrivs = $"SELECT OWNER || '.' || TABLE_NAME AS OBJECT_NAME, PRIVILEGE, GRANTABLE FROM DBA_TAB_PRIVS WHERE GRANTEE = '{grantee}'";
             string queryColPrivs = $"SELECT OWNER || '.' || TABLE_NAME || '.' || COLUMN_NAME AS OBJECT_NAME, PRIVILEGE, GRANTABLE FROM DBA_COL_PRIVS WHERE GRANTEE = '{grantee}'";
+            // MỚI THÊM: Truy vấn các Role đã được gán cho User
+            string queryRolePrivs = $"SELECT GRANTED_ROLE AS OBJECT_NAME, 'ROLE' AS PRIVILEGE, ADMIN_OPTION AS GRANTABLE FROM DBA_ROLE_PRIVS WHERE GRANTEE = '{grantee}'";
 
-            // Nối 2 bảng bằng UNION ALL
-            DataTable dt = db.ExecuteQuery($"{queryObjPrivs} UNION ALL {queryColPrivs}");
+            // Nối 3 bảng bằng UNION ALL
+            DataTable dt = db.ExecuteQuery($"{queryObjPrivs} UNION ALL {queryColPrivs} UNION ALL {queryRolePrivs}");
 
             if (dt != null)
             {
@@ -653,13 +735,14 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // 5. Cấp Quyền (Grant)
+        // 5. CẬP NHẬT: Cấp Quyền (Grant) và Cấp Role
         private void btnGrantPriv_Click(object sender, EventArgs e)
         {
             string grantee = cboGrantee.SelectedItem?.ToString();
+            string objType = cboObjectType.SelectedItem?.ToString();
             string fullObjName = cboObjectName.SelectedItem?.ToString();
 
-            if (string.IsNullOrEmpty(grantee) || string.IsNullOrEmpty(fullObjName) || clbPrivs.CheckedItems.Count == 0)
+            if (string.IsNullOrEmpty(grantee) || string.IsNullOrEmpty(fullObjName))
             {
                 MessageBox.Show("Vui lòng chọn Grantee, Object và ít nhất 1 Privilege!", "Cảnh báo");
                 return;
@@ -667,7 +750,22 @@ namespace OracleSecurityAdmin
 
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-            string grantOption = chkWithGrantOption.Checked ? " WITH GRANT OPTION" : "";
+
+            // Xử lý cờ tuỳ chọn cấp tiếp
+            string grantOption = chkWithGrantOption.Checked ? (objType == "ROLE" ? " WITH ADMIN OPTION" : " WITH GRANT OPTION") : "";
+
+            // MỚI THÊM: Nếu là gán Role
+            if (objType == "ROLE")
+            {
+                if (db.ExecuteNonQuery($"GRANT {fullObjName} TO {grantee}{grantOption}"))
+                {
+                    MessageBox.Show("Cấp role thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    btnViewPrivs_Click(sender, e);
+                }
+                return;
+            }
+
+            if (clbPrivs.CheckedItems.Count == 0) return;
             bool success = true;
 
             foreach (var item in clbPrivs.CheckedItems)
@@ -698,13 +796,14 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // 6. Thu hồi Quyền (Revoke)
+        // 6. CẬP NHẬT: Thu hồi Quyền (Revoke) và Thu hồi Role
         private void btnRevokePriv_Click(object sender, EventArgs e)
         {
             string grantee = cboGrantee.SelectedItem?.ToString();
+            string objType = cboObjectType.SelectedItem?.ToString();
             string fullObjName = cboObjectName.SelectedItem?.ToString();
 
-            if (string.IsNullOrEmpty(grantee) || string.IsNullOrEmpty(fullObjName) || clbPrivs.CheckedItems.Count == 0)
+            if (string.IsNullOrEmpty(grantee) || string.IsNullOrEmpty(fullObjName))
             {
                 MessageBox.Show("Vui lòng chọn Grantee, Object và Privilege cần thu hồi!", "Cảnh báo");
                 return;
@@ -712,6 +811,19 @@ namespace OracleSecurityAdmin
 
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+
+            // MỚI THÊM: Nếu là thu hồi Role
+            if (objType == "ROLE")
+            {
+                if (db.ExecuteNonQuery($"REVOKE {fullObjName} FROM {grantee}"))
+                {
+                    MessageBox.Show("Thu hồi role thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    btnViewPrivs_Click(sender, e);
+                }
+                return;
+            }
+
+            if (clbPrivs.CheckedItems.Count == 0) return;
             bool success = true;
 
             foreach (var item in clbPrivs.CheckedItems)

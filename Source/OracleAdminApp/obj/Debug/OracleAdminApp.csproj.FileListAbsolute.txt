@@ -25,11 +25,11 @@ E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\bin\Debug\System.Text.Json.xml
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\bin\Debug\System.Threading.Tasks.Extensions.xml
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\bin\Debug\System.ValueTuple.xml
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAdminApp.csproj.AssemblyReference.cache
+E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleSecurityAdmin.Form1.resources
+E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleSecurityAdmin.LoginForm.resources
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAdminApp.Properties.Resources.resources
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAdminApp.csproj.GenerateResource.cache
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAdminApp.csproj.CoreCompileInputs.cache
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAd.364A6572.Up2Date
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAdminApp.exe
 E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleAdminApp.pdb
-E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleSecurityAdmin.Form1.resources
-E:\PhanHe1_ATBM_2526\Source\OracleAdminApp\obj\Debug\OracleSecurityAdmin.LoginForm.resources
