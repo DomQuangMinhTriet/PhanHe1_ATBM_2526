@@ -77,11 +77,8 @@ namespace OracleSecurityAdmin
             this.dgvList = new System.Windows.Forms.DataGridView();
             this.cboType = new System.Windows.Forms.ComboBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-
-            // Khởi tạo biến mới
             this.lblGranteeType = new System.Windows.Forms.Label();
             this.cboGranteeType = new System.Windows.Forms.ComboBox();
-
             this.lblGrantee = new System.Windows.Forms.Label();
             this.cboGrantee = new System.Windows.Forms.ComboBox();
             this.btnViewPrivs = new System.Windows.Forms.Button();
@@ -273,7 +270,7 @@ namespace OracleSecurityAdmin
             this.tabPage2.Text = "Grant/Revoke";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // lblGranteeType (MỚI)
+            // lblGranteeType
             // 
             this.lblGranteeType.AutoSize = true;
             this.lblGranteeType.Location = new System.Drawing.Point(10, 15);
@@ -282,10 +279,12 @@ namespace OracleSecurityAdmin
             this.lblGranteeType.TabIndex = 15;
             this.lblGranteeType.Text = "Type:";
             // 
-            // cboGranteeType (MỚI)
+            // cboGranteeType
             // 
             this.cboGranteeType.FormattingEnabled = true;
-            this.cboGranteeType.Items.AddRange(new object[] { "User", "Role" });
+            this.cboGranteeType.Items.AddRange(new object[] {
+            "User",
+            "Role"});
             this.cboGranteeType.Location = new System.Drawing.Point(13, 35);
             this.cboGranteeType.Name = "cboGranteeType";
             this.cboGranteeType.Size = new System.Drawing.Size(70, 21);
@@ -339,7 +338,6 @@ namespace OracleSecurityAdmin
             // cboObjectType
             // 
             this.cboObjectType.FormattingEnabled = true;
-            // ĐÃ THÊM "ROLE" VÀO Items
             this.cboObjectType.Items.AddRange(new object[] {
             "TABLE",
             "VIEW",
@@ -409,9 +407,8 @@ namespace OracleSecurityAdmin
             this.chkWithGrantOption.AutoSize = true;
             this.chkWithGrantOption.Location = new System.Drawing.Point(13, 270);
             this.chkWithGrantOption.Name = "chkWithGrantOption";
-            this.chkWithGrantOption.Size = new System.Drawing.Size(193, 17);
+            this.chkWithGrantOption.Size = new System.Drawing.Size(180, 17);
             this.chkWithGrantOption.TabIndex = 12;
-            // CẬP NHẬT TÊN ĐỂ PHÙ HỢP VỚI CẢ ADMIN OPTION CỦA ROLE
             this.chkWithGrantOption.Text = "WITH GRANT/ADMIN OPTION";
             this.chkWithGrantOption.UseVisualStyleBackColor = true;
             // 
@@ -457,9 +454,49 @@ namespace OracleSecurityAdmin
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Cấu hình DataGridView 
+            dgvList.AllowUserToAddRows = false; // Xoá dòng trống có dấu *
+            dgvList.ReadOnly = true;            // Chỉ đọc, tránh cảnh báo lỗi khi gõ bừa vào
+            dgvList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvList.MultiSelect = false;        // Chỉ cho chọn từng dòng 1
+            dgvList.RowHeadersVisible = false;  // Giấu cột mũi tên bên trái cùng cho nhỏ gọn
+            dgvList.BackgroundColor = Color.White;
+
+            // Đăng ký các sự kiện giúp tương tác UI nhạy bén
+            dgvList.CellClick += DgvList_CellClick;
+            cboType.SelectedIndexChanged += CboType_SelectedIndexChanged;
+
             // Thiết lập mặc định khi mở Form
-            cboType.SelectedIndex = 0; // Chọn sẵn "User" cho Tab 1
+            cboType.SelectedIndex = 0; // Tự gán User (sẽ tự động gọi sự kiện Load lưới luôn)
             LoadGranteesTab2();        // Tự động load danh sách Grantee bên Tab 2
+        }
+
+        // Tự động đẩy tên User/Role lên TextBox khi nhấp vào bảng
+        private void DgvList_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.RowIndex < dgvList.Rows.Count)
+            {
+                DataGridViewRow row = dgvList.Rows[e.RowIndex];
+                string type = cboType.SelectedItem?.ToString();
+
+                if (type == "User" && dgvList.Columns.Contains("USERNAME"))
+                {
+                    txtTen.Text = row.Cells["USERNAME"].Value?.ToString();
+                }
+                else if (type == "Role" && dgvList.Columns.Contains("ROLE"))
+                {
+                    txtTen.Text = row.Cells["ROLE"].Value?.ToString();
+                }
+                txtMatKhau.Clear(); // Luôn xoá rỗng password, buộc admin phải nhập lại khi update
+            }
+        }
+
+        // Tự khởi chạy chức năng LOAD khi đổi loại hiển thị (User <-> Role)
+        private void CboType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtTen.Clear();
+            txtMatKhau.Clear();
+            btnLoad_Click(null, null); // Tự động load dữ liệu lên bảng luôn
         }
 
         private void btnLogout_Click(object sender, EventArgs e)
@@ -843,3 +880,4 @@ namespace OracleSecurityAdmin
         }
     }
 }
+
