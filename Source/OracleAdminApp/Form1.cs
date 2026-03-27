@@ -22,6 +22,7 @@ namespace OracleSecurityAdmin
         private Button btnCreate;
         private TextBox txtMatKhau;
         private TextBox txtTen;
+        private Button btnTogglePassword;
         private DataGridView dgvList;
         private ComboBox cboType;
 
@@ -73,6 +74,7 @@ namespace OracleSecurityAdmin
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnCreate = new System.Windows.Forms.Button();
             this.txtMatKhau = new System.Windows.Forms.TextBox();
+            this.btnTogglePassword = new System.Windows.Forms.Button();
             this.txtTen = new System.Windows.Forms.TextBox();
             this.dgvList = new System.Windows.Forms.DataGridView();
             this.cboType = new System.Windows.Forms.ComboBox();
@@ -122,6 +124,7 @@ namespace OracleSecurityAdmin
             this.tabUserRole.Controls.Add(this.btnDelete);
             this.tabUserRole.Controls.Add(this.btnCreate);
             this.tabUserRole.Controls.Add(this.txtMatKhau);
+            this.tabUserRole.Controls.Add(this.btnTogglePassword);
             this.tabUserRole.Controls.Add(this.txtTen);
             this.tabUserRole.Controls.Add(this.dgvList);
             this.tabUserRole.Controls.Add(this.cboType);
@@ -216,6 +219,17 @@ namespace OracleSecurityAdmin
             this.txtMatKhau.Name = "txtMatKhau";
             this.txtMatKhau.Size = new System.Drawing.Size(100, 20);
             this.txtMatKhau.TabIndex = 15;
+            this.txtMatKhau.UseSystemPasswordChar = true;
+            //
+            // btnTogglePassword
+            //
+            this.btnTogglePassword.Location = new System.Drawing.Point(117, 260);
+            this.btnTogglePassword.Name = "btnTogglePassword";
+            this.btnTogglePassword.Size = new System.Drawing.Size(40, 23);
+            this.btnTogglePassword.TabIndex = 24;
+            this.btnTogglePassword.Text = "\ud83d\udc41";
+            this.btnTogglePassword.UseVisualStyleBackColor = true;
+            this.btnTogglePassword.Click += new System.EventHandler(this.btnTogglePassword_Click);
             // 
             // txtTen
             // 
@@ -506,6 +520,11 @@ namespace OracleSecurityAdmin
             {
                 Application.Restart();
             }
+        }
+
+        private void btnTogglePassword_Click(object sender, EventArgs e)
+        {
+            txtMatKhau.UseSystemPasswordChar = !txtMatKhau.UseSystemPasswordChar;
         }
 
         // --- CÁC HÀM CŨ CỦA BẠN BÊN TAB 1 (GIỮ NGUYÊN 100%) ---

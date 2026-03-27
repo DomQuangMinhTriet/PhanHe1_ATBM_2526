@@ -15,6 +15,7 @@ namespace OracleSecurityAdmin
         private TextBox txtServiceName;
         private TextBox txtUsername;
         private TextBox txtPassword;
+        private Button btnTogglePassword;
         private Button btnLogin;
         private Label lblPassword;
 
@@ -65,6 +66,7 @@ namespace OracleSecurityAdmin
             this.txtServiceName = new System.Windows.Forms.TextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.txtPassword = new System.Windows.Forms.TextBox();
+            this.btnTogglePassword = new System.Windows.Forms.Button();
             this.btnLogin = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -147,6 +149,17 @@ namespace OracleSecurityAdmin
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(100, 20);
             this.txtPassword.TabIndex = 9;
+            this.txtPassword.UseSystemPasswordChar = true;
+            //
+            // btnTogglePassword
+            //
+            this.btnTogglePassword.Location = new System.Drawing.Point(509, 261);
+            this.btnTogglePassword.Name = "btnTogglePassword";
+            this.btnTogglePassword.Size = new System.Drawing.Size(40, 23);
+            this.btnTogglePassword.TabIndex = 11;
+            this.btnTogglePassword.Text = "👁";
+            this.btnTogglePassword.UseVisualStyleBackColor = true;
+            this.btnTogglePassword.Click += new System.EventHandler(this.btnTogglePassword_Click);
             // 
             // btnLogin
             // 
@@ -161,6 +174,7 @@ namespace OracleSecurityAdmin
             // 
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnLogin);
+            this.Controls.Add(this.btnTogglePassword);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.txtServiceName);
@@ -175,6 +189,11 @@ namespace OracleSecurityAdmin
             this.ResumeLayout(false);
             this.PerformLayout();
 
+        }
+
+        private void btnTogglePassword_Click(object sender, EventArgs e)
+        {
+            txtPassword.UseSystemPasswordChar = !txtPassword.UseSystemPasswordChar;
         }
     }
 }
