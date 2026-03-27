@@ -1,5 +1,6 @@
 ﻿using OracleAdminApp;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace OracleSecurityAdmin
@@ -18,19 +19,21 @@ namespace OracleSecurityAdmin
         private Button btnTogglePassword;
         private Button btnLogin;
         private Label lblPassword;
+        private bool _isPasswordVisible;
 
         public LoginForm()
         {
             InitializeComponent();
+            InitPlaceholders();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            string host = txtHost.Text.Trim();
-            string port = txtPort.Text.Trim();
-            string serviceName = txtServiceName.Text.Trim();
-            string username = txtUsername.Text.Trim();
-            string password = txtPassword.Text.Trim();
+            string host = GetInputText(txtHost);
+            string port = GetInputText(txtPort);
+            string serviceName = GetInputText(txtServiceName);
+            string username = GetInputText(txtUsername);
+            string password = GetInputText(txtPassword);
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(host))
             {
@@ -193,7 +196,76 @@ namespace OracleSecurityAdmin
 
         private void btnTogglePassword_Click(object sender, EventArgs e)
         {
-            txtPassword.UseSystemPasswordChar = !txtPassword.UseSystemPasswordChar;
+            var info = txtPassword.Tag as PlaceholderInfo;
+            bool isPlaceholder = info != null && IsPlaceholder(txtPassword, info);
+            _isPasswordVisible = !_isPasswordVisible;
+            if (!isPlaceholder)
+            {
+                txtPassword.UseSystemPasswordChar = !_isPasswordVisible;
+            }
+            else
+            {
+                txtPassword.UseSystemPasswordChar = false;
+            }
+        }
+
+        private void InitPlaceholders()
+        {
+            SetupPlaceholder(txtHost, "Enter host", false);
+            SetupPlaceholder(txtPort, "Enter port", false);
+            SetupPlaceholder(txtServiceName, "Enter service name", false);
+            SetupPlaceholder(txtUsername, "Enter username", false);
+            SetupPlaceholder(txtPassword, "Enter password", true);
+        }
+
+        private void SetupPlaceholder(TextBox box, string placeholder, bool isPassword)
+        {
+            box.Tag = new PlaceholderInfo { Text = placeholder, IsPassword = isPassword };
+            box.ForeColor = Color.Gray;
+            box.Text = placeholder;
+            if (isPassword) box.UseSystemPasswordChar = false;
+            box.Enter += Placeholder_Enter;
+            box.Leave += Placeholder_Leave;
+        }
+
+        private void Placeholder_Enter(object sender, EventArgs e)
+        {
+            if (!(sender is TextBox box) || !(box.Tag is PlaceholderInfo info)) return;
+            if (IsPlaceholder(box, info))
+            {
+                box.Text = string.Empty;
+                box.ForeColor = Color.Black;
+                if (info.IsPassword) box.UseSystemPasswordChar = !_isPasswordVisible;
+            }
+        }
+
+        private void Placeholder_Leave(object sender, EventArgs e)
+        {
+            if (!(sender is TextBox box) || !(box.Tag is PlaceholderInfo info)) return;
+            if (string.IsNullOrWhiteSpace(box.Text))
+            {
+                box.Text = info.Text;
+                box.ForeColor = Color.Gray;
+                if (info.IsPassword) box.UseSystemPasswordChar = false;
+            }
+        }
+
+        private bool IsPlaceholder(TextBox box, PlaceholderInfo info)
+        {
+            return box.ForeColor == Color.Gray && box.Text == info.Text;
+        }
+
+        private string GetInputText(TextBox box)
+        {
+            var info = box.Tag as PlaceholderInfo;
+            if (info != null && IsPlaceholder(box, info)) return string.Empty;
+            return box.Text.Trim();
+        }
+
+        private class PlaceholderInfo
+        {
+            public string Text { get; set; }
+            public bool IsPassword { get; set; }
         }
     }
 }

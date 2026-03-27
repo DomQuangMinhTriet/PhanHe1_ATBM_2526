@@ -25,6 +25,7 @@ namespace OracleSecurityAdmin
         private Button btnTogglePassword;
         private DataGridView dgvList;
         private ComboBox cboType;
+        private bool _isPasswordVisible;
 
         // === CÁC BIẾN MỚI THÊM CHO TAB 2 (GRANT/REVOKE) ===
         private Label lblGranteeType;  // MỚI THÊM: Nhãn cho Loại Grantee
@@ -49,6 +50,7 @@ namespace OracleSecurityAdmin
         public Form1()
         {
             InitializeComponent();
+            InitPlaceholders();
         }
         // Constructor nhận tham số từ LoginForm
         public Form1(string host, string port, string serviceName, string username, string password)
@@ -59,6 +61,7 @@ namespace OracleSecurityAdmin
             _serviceName = serviceName;
             _username = username;
             _password = password;
+            InitPlaceholders();
         }
 
         private void InitializeComponent()
@@ -483,6 +486,8 @@ namespace OracleSecurityAdmin
             // Thiết lập mặc định khi mở Form
             cboType.SelectedIndex = 0; // Tự gán User (sẽ tự động gọi sự kiện Load lưới luôn)
             LoadGranteesTab2();        // Tự động load danh sách Grantee bên Tab 2
+            ApplyPlaceholderIfEmpty(txtTen);
+            ApplyPlaceholderIfEmpty(txtMatKhau);
         }
 
         // Tự động đẩy tên User/Role lên TextBox khi nhấp vào bảng
@@ -502,6 +507,7 @@ namespace OracleSecurityAdmin
                     txtTen.Text = row.Cells["ROLE"].Value?.ToString();
                 }
                 txtMatKhau.Clear(); // Luôn xoá rỗng password, buộc admin phải nhập lại khi update
+                ApplyPlaceholderIfEmpty(txtMatKhau);
             }
         }
 
@@ -510,6 +516,8 @@ namespace OracleSecurityAdmin
         {
             txtTen.Clear();
             txtMatKhau.Clear();
+            ApplyPlaceholderIfEmpty(txtTen);
+            ApplyPlaceholderIfEmpty(txtMatKhau);
             btnLoad_Click(null, null); // Tự động load dữ liệu lên bảng luôn
         }
 
@@ -524,7 +532,17 @@ namespace OracleSecurityAdmin
 
         private void btnTogglePassword_Click(object sender, EventArgs e)
         {
-            txtMatKhau.UseSystemPasswordChar = !txtMatKhau.UseSystemPasswordChar;
+            var info = txtMatKhau.Tag as PlaceholderInfo;
+            bool isPlaceholder = info != null && IsPlaceholder(txtMatKhau, info);
+            _isPasswordVisible = !_isPasswordVisible;
+            if (!isPlaceholder)
+            {
+                txtMatKhau.UseSystemPasswordChar = !_isPasswordVisible;
+            }
+            else
+            {
+                txtMatKhau.UseSystemPasswordChar = false;
+            }
         }
 
         // --- CÁC HÀM CŨ CỦA BẠN BÊN TAB 1 (GIỮ NGUYÊN 100%) ---
@@ -560,8 +578,8 @@ namespace OracleSecurityAdmin
 
         private void btnCreate_Click(object sender, EventArgs e)
         {
-            string ten = txtTen.Text.Trim().ToUpper();
-            string matKhau = txtMatKhau.Text.Trim();
+            string ten = GetInputText(txtTen).ToUpper();
+            string matKhau = GetInputText(txtMatKhau);
             string loai = cboType.SelectedItem?.ToString();
 
             if (string.IsNullOrEmpty(ten) || string.IsNullOrEmpty(loai))
@@ -594,13 +612,15 @@ namespace OracleSecurityAdmin
                 btnLoad_Click(sender, e);
                 txtTen.Clear();
                 txtMatKhau.Clear();
+                ApplyPlaceholderIfEmpty(txtTen);
+                ApplyPlaceholderIfEmpty(txtMatKhau);
                 LoadGranteesTab2(); // Cập nhật lại danh sách bên tab 2
             }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            string ten = txtTen.Text.Trim().ToUpper();
+            string ten = GetInputText(txtTen).ToUpper();
             string loai = cboType.SelectedItem?.ToString();
 
             if (string.IsNullOrEmpty(ten))
@@ -622,6 +642,7 @@ namespace OracleSecurityAdmin
                     MessageBox.Show($"Đã xóa {loai} '{ten}' thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     btnLoad_Click(sender, e);
                     txtTen.Clear();
+                    ApplyPlaceholderIfEmpty(txtTen);
                     LoadGranteesTab2(); // Cập nhật lại danh sách bên tab 2
                 }
             }
@@ -629,8 +650,8 @@ namespace OracleSecurityAdmin
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            string ten = txtTen.Text.Trim().ToUpper();
-            string matKhau = txtMatKhau.Text.Trim();
+            string ten = GetInputText(txtTen).ToUpper();
+            string matKhau = GetInputText(txtMatKhau);
             string loai = cboType.SelectedItem?.ToString();
 
             if (string.IsNullOrEmpty(ten) || string.IsNullOrEmpty(matKhau))
@@ -661,6 +682,7 @@ namespace OracleSecurityAdmin
                     MessageBox.Show($"Đã cập nhật mật khẩu cho {loai} '{ten}' thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     btnLoad_Click(sender, e);
                     txtMatKhau.Clear();
+                    ApplyPlaceholderIfEmpty(txtMatKhau);
                 }
             }
         }
@@ -896,6 +918,73 @@ namespace OracleSecurityAdmin
                 MessageBox.Show("Thu hồi quyền thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 btnViewPrivs_Click(sender, e);
             }
+        }
+
+        private void InitPlaceholders()
+        {
+            SetupPlaceholder(txtTen, "Enter user/role name", false);
+            SetupPlaceholder(txtMatKhau, "Enter password", true);
+        }
+
+        private void SetupPlaceholder(TextBox box, string placeholder, bool isPassword)
+        {
+            box.Tag = new PlaceholderInfo { Text = placeholder, IsPassword = isPassword };
+            box.ForeColor = Color.Gray;
+            box.Text = placeholder;
+            if (isPassword) box.UseSystemPasswordChar = false;
+            box.Enter += Placeholder_Enter;
+            box.Leave += Placeholder_Leave;
+        }
+
+        private void Placeholder_Enter(object sender, EventArgs e)
+        {
+            if (!(sender is TextBox box) || !(box.Tag is PlaceholderInfo info)) return;
+            if (IsPlaceholder(box, info))
+            {
+                box.Text = string.Empty;
+                box.ForeColor = Color.Black;
+                if (info.IsPassword) box.UseSystemPasswordChar = !_isPasswordVisible;
+            }
+        }
+
+        private void Placeholder_Leave(object sender, EventArgs e)
+        {
+            if (!(sender is TextBox box) || !(box.Tag is PlaceholderInfo info)) return;
+            if (string.IsNullOrWhiteSpace(box.Text))
+            {
+                box.Text = info.Text;
+                box.ForeColor = Color.Gray;
+                if (info.IsPassword) box.UseSystemPasswordChar = false;
+            }
+        }
+
+        private bool IsPlaceholder(TextBox box, PlaceholderInfo info)
+        {
+            return box.ForeColor == Color.Gray && box.Text == info.Text;
+        }
+
+        private string GetInputText(TextBox box)
+        {
+            var info = box.Tag as PlaceholderInfo;
+            if (info != null && IsPlaceholder(box, info)) return string.Empty;
+            return box.Text.Trim();
+        }
+
+        private void ApplyPlaceholderIfEmpty(TextBox box)
+        {
+            var info = box.Tag as PlaceholderInfo;
+            if (info != null && string.IsNullOrWhiteSpace(box.Text))
+            {
+                box.Text = info.Text;
+                box.ForeColor = Color.Gray;
+                if (info.IsPassword) box.UseSystemPasswordChar = false;
+            }
+        }
+
+        private class PlaceholderInfo
+        {
+            public string Text { get; set; }
+            public bool IsPassword { get; set; }
         }
     }
 }
