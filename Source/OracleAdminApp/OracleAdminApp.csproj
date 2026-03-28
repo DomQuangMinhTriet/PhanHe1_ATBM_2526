@@ -92,6 +92,18 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="uc_Grant.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uc_Grant.Designer.cs">
+      <DependentUpon>uc_Grant.cs</DependentUpon>
+    </Compile>
+    <Compile Include="uc_Management.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uc_Management.Designer.cs">
+      <DependentUpon>uc_Management.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -107,6 +119,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="uc_Grant.resx">
+      <DependentUpon>uc_Grant.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="uc_Management.resx">
+      <DependentUpon>uc_Management.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>

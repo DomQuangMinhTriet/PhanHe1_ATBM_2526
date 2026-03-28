@@ -25,6 +25,21 @@ namespace OracleSecurityAdmin
         {
             InitializeComponent();
             InitPlaceholders();
+
+            // === GÁN CỨNG THÔNG TIN ĐỂ TEST Ở ĐÂY ===
+            txtHost.Text = "localhost";        // Hoặc IP máy của Tồ
+            txtPort.Text = "11521";             // Port mặc định Oracle
+            txtServiceName.Text = "xepdb1";      // Tên Service 
+            txtUsername.Text = "ADMIN_ATBM";          // User để test
+            txtPassword.Text = "123";          // 
+
+            // Lưu ý: Vì Tồ dùng Placeholder, nên khi gán cứng 
+            // Tồ cần đổi màu chữ sang đen để nó không bị mờ như placeholder
+            txtHost.ForeColor = Color.Black;
+            txtPort.ForeColor = Color.Black;
+            txtServiceName.ForeColor = Color.Black;
+            txtUsername.ForeColor = Color.Black;
+            txtPassword.ForeColor = Color.Black;
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
