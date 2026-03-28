@@ -10,10 +10,8 @@ namespace OracleSecurityAdmin
         private OracleConnection connection;
         private string connectionString;
 
-        // Hàm khởi tạo chuỗi kết nối
         public void BuildConnectionString(string host, string port, string serviceName, string username, string password, bool isSysDba = false)
         {
-            // Cú pháp kết nối chuẩn của Oracle Managed Data Access
             connectionString = $"Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME={serviceName})));User Id={username};Password={password};";
 
             if (isSysDba)
@@ -22,7 +20,6 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // Hàm mở kết nối để test lúc đăng nhập
         public bool Connect()
         {
             try
@@ -38,7 +35,6 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // Hàm ngắt kết nối
         public void Disconnect()
         {
             if (connection != null && connection.State == ConnectionState.Open)
@@ -47,13 +43,11 @@ namespace OracleSecurityAdmin
             }
         }
 
-        // Hàm thực thi lệnh SELECT và trả về DataTable (Dùng để đổ dữ liệu lên DataGridView)
         public DataTable ExecuteQuery(string query)
         {
             DataTable dataTable = new DataTable();
             try
             {
-                // Thêm dòng này để khởi tạo connection nếu nó bị null
                 if (connection == null)
                 {
                     connection = new OracleConnection(connectionString);
@@ -76,12 +70,10 @@ namespace OracleSecurityAdmin
             return dataTable;
         }
 
-        // Hàm thực thi lệnh INSERT, UPDATE, DELETE, DDL, DCL (Tạo user, Cấp quyền...)
         public bool ExecuteNonQuery(string query)
         {
             try
             {
-                // Thêm dòng này để khởi tạo connection nếu nó bị null
                 if (connection == null)
                 {
                     connection = new OracleConnection(connectionString);

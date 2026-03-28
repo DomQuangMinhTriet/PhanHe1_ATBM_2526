@@ -11,7 +11,6 @@ namespace OracleSecurityAdmin
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            // Chạy Form Đăng nhập đầu tiên
             Application.Run(new LoginForm());
         }
     }

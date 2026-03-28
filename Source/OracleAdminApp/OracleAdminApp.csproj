@@ -104,6 +104,12 @@
     <Compile Include="uc_Management.Designer.cs">
       <DependentUpon>uc_Management.cs</DependentUpon>
     </Compile>
+    <Compile Include="uc_Revoke.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="uc_Revoke.Designer.cs">
+      <DependentUpon>uc_Revoke.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

@@ -26,15 +26,12 @@ namespace OracleSecurityAdmin
             InitializeComponent();
             InitPlaceholders();
 
-            // === GÁN CỨNG THÔNG TIN ĐỂ TEST Ở ĐÂY ===
-            txtHost.Text = "localhost";        // Hoặc IP máy của Tồ
-            txtPort.Text = "11521";             // Port mặc định Oracle
-            txtServiceName.Text = "xepdb1";      // Tên Service 
-            txtUsername.Text = "ADMIN_ATBM";          // User để test
-            txtPassword.Text = "123";          // 
+            txtHost.Text = "localhost";
+            txtPort.Text = "11521";
+            txtServiceName.Text = "xepdb1";
+            txtUsername.Text = "ADMIN_ATBM";
+            txtPassword.Text = "123";
 
-            // Lưu ý: Vì Tồ dùng Placeholder, nên khi gán cứng 
-            // Tồ cần đổi màu chữ sang đen để nó không bị mờ như placeholder
             txtHost.ForeColor = Color.Black;
             txtPort.ForeColor = Color.Black;
             txtServiceName.ForeColor = Color.Black;
@@ -57,14 +54,12 @@ namespace OracleSecurityAdmin
             }
 
             DatabaseHelper db = new DatabaseHelper();
-            // isSysDba = false vì ta dùng tài khoản DBA tạo riêng (ví dụ C##ADMIN_DBA)
             db.BuildConnectionString(host, port, serviceName, username, password, false);
 
             if (db.Connect())
             {
-                db.Disconnect(); // Ngắt kết nối test
+                db.Disconnect();
 
-                // Mở Form1 và truyền thông tin kết nối sang
                 Form1 mainForm = new Form1(host, port, serviceName, username, password);
                 this.Hide();
                 mainForm.ShowDialog();
