@@ -1,5 +1,6 @@
 ﻿using OracleAdminApp;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace OracleSecurityAdmin
@@ -15,21 +16,24 @@ namespace OracleSecurityAdmin
         private TextBox txtServiceName;
         private TextBox txtUsername;
         private TextBox txtPassword;
+        private Button btnTogglePassword;
         private Button btnLogin;
         private Label lblPassword;
+        private bool _isPasswordVisible;
 
         public LoginForm()
         {
             InitializeComponent();
+            InitPlaceholders();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            string host = txtHost.Text.Trim();
-            string port = txtPort.Text.Trim();
-            string serviceName = txtServiceName.Text.Trim();
-            string username = txtUsername.Text.Trim();
-            string password = txtPassword.Text.Trim();
+            string host = GetInputText(txtHost);
+            string port = GetInputText(txtPort);
+            string serviceName = GetInputText(txtServiceName);
+            string username = GetInputText(txtUsername);
+            string password = GetInputText(txtPassword);
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(host))
             {
@@ -65,6 +69,7 @@ namespace OracleSecurityAdmin
             this.txtServiceName = new System.Windows.Forms.TextBox();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.txtPassword = new System.Windows.Forms.TextBox();
+            this.btnTogglePassword = new System.Windows.Forms.Button();
             this.btnLogin = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -119,6 +124,8 @@ namespace OracleSecurityAdmin
             this.txtHost.Name = "txtHost";
             this.txtHost.Size = new System.Drawing.Size(100, 20);
             this.txtHost.TabIndex = 5;
+            this.txtHost.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // txtPort
             // 
@@ -126,6 +133,8 @@ namespace OracleSecurityAdmin
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(100, 20);
             this.txtPort.TabIndex = 6;
+            this.txtPort.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // txtServiceName
             // 
@@ -133,6 +142,8 @@ namespace OracleSecurityAdmin
             this.txtServiceName.Name = "txtServiceName";
             this.txtServiceName.Size = new System.Drawing.Size(100, 20);
             this.txtServiceName.TabIndex = 7;
+            this.txtServiceName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // txtUsername
             // 
@@ -140,6 +151,8 @@ namespace OracleSecurityAdmin
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(100, 20);
             this.txtUsername.TabIndex = 8;
+            this.txtUsername.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // txtPassword
             // 
@@ -147,6 +160,20 @@ namespace OracleSecurityAdmin
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(100, 20);
             this.txtPassword.TabIndex = 9;
+            this.txtPassword.UseSystemPasswordChar = true;
+            this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            //
+            // btnTogglePassword
+            //
+            this.btnTogglePassword.Location = new System.Drawing.Point(509, 261);
+            this.btnTogglePassword.Name = "btnTogglePassword";
+            this.btnTogglePassword.Size = new System.Drawing.Size(40, 23);
+            this.btnTogglePassword.TabIndex = 11;
+            this.btnTogglePassword.Text = "👁";
+            this.btnTogglePassword.UseVisualStyleBackColor = true;
+            this.btnTogglePassword.Click += new System.EventHandler(this.btnTogglePassword_Click);
+            this.btnTogglePassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // btnLogin
             // 
@@ -157,10 +184,13 @@ namespace OracleSecurityAdmin
             this.btnLogin.Text = "Login";
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);            // 
+            this.btnLogin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             // LoginForm
             // 
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.btnLogin);
+            this.Controls.Add(this.btnTogglePassword);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.txtUsername);
             this.Controls.Add(this.txtServiceName);
@@ -172,9 +202,84 @@ namespace OracleSecurityAdmin
             this.Controls.Add(this.lblPort);
             this.Controls.Add(this.lblHost);
             this.Name = "LoginForm";
+            this.AcceptButton = this.btnLogin;
             this.ResumeLayout(false);
             this.PerformLayout();
 
+        }
+
+        private void btnTogglePassword_Click(object sender, EventArgs e)
+        {
+            var info = txtPassword.Tag as PlaceholderInfo;
+            bool isPlaceholder = info != null && IsPlaceholder(txtPassword, info);
+            _isPasswordVisible = !_isPasswordVisible;
+            if (!isPlaceholder)
+            {
+                txtPassword.UseSystemPasswordChar = !_isPasswordVisible;
+            }
+            else
+            {
+                txtPassword.UseSystemPasswordChar = false;
+            }
+        }
+
+        private void InitPlaceholders()
+        {
+            SetupPlaceholder(txtHost, "Enter host", false);
+            SetupPlaceholder(txtPort, "Enter port", false);
+            SetupPlaceholder(txtServiceName, "Enter service name", false);
+            SetupPlaceholder(txtUsername, "Enter username", false);
+            SetupPlaceholder(txtPassword, "Enter password", true);
+        }
+
+        private void SetupPlaceholder(TextBox box, string placeholder, bool isPassword)
+        {
+            box.Tag = new PlaceholderInfo { Text = placeholder, IsPassword = isPassword };
+            box.ForeColor = Color.Gray;
+            box.Text = placeholder;
+            if (isPassword) box.UseSystemPasswordChar = false;
+            box.Enter += Placeholder_Enter;
+            box.Leave += Placeholder_Leave;
+        }
+
+        private void Placeholder_Enter(object sender, EventArgs e)
+        {
+            if (!(sender is TextBox box) || !(box.Tag is PlaceholderInfo info)) return;
+            if (IsPlaceholder(box, info))
+            {
+                box.Text = string.Empty;
+                box.ForeColor = Color.Black;
+                if (info.IsPassword) box.UseSystemPasswordChar = !_isPasswordVisible;
+            }
+        }
+
+        private void Placeholder_Leave(object sender, EventArgs e)
+        {
+            if (!(sender is TextBox box) || !(box.Tag is PlaceholderInfo info)) return;
+            if (string.IsNullOrWhiteSpace(box.Text))
+            {
+                box.Text = info.Text;
+                box.ForeColor = Color.Gray;
+                if (info.IsPassword) box.UseSystemPasswordChar = false;
+            }
+        }
+
+        private bool IsPlaceholder(TextBox box, PlaceholderInfo info)
+        {
+            return box.ForeColor == Color.Gray && box.Text == info.Text;
+        }
+
+        private string GetInputText(TextBox box)
+        {
+            var info = box.Tag as PlaceholderInfo;
+            if (info != null && IsPlaceholder(box, info)) return string.Empty;
+            return box.Text.Trim();
+        }
+
+        private class PlaceholderInfo
+        {
+            public string Text { get; set; }
+            public bool IsPassword { get; set; }
         }
     }
 }
