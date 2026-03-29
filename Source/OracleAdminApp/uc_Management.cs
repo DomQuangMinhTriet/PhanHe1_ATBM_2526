@@ -29,23 +29,65 @@ namespace OracleSecurityAdmin
             dgvList.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvList.BackgroundColor = Color.White;
 
+            cboType.Items.Clear();
+            cboType.Items.AddRange(new object[] { "Tất cả", "User", "Role" });
+
             cboType.SelectedIndex = 0;
             ApplyPlaceholderIfEmpty(txtTen);
             ApplyPlaceholderIfEmpty(txtMatKhau);
         }
 
+        //public void btnLoad_Click(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrEmpty(_host) || string.IsNullOrEmpty(_username)) return;
+        //    DatabaseHelper db = new DatabaseHelper();
+        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+        //    string query = "";
+        //    string loai = cboType.SelectedItem?.ToString();
+        //    if (loai == "User") query = "SELECT USERNAME, ACCOUNT_STATUS, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N' ORDER BY CREATED DESC";
+        //    else if (loai == "Role") query = "SELECT ROLE, ROLE_ID, PASSWORD_REQUIRED FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N' ORDER BY ROLE_ID DESC";
+
+        //    DataTable dt = db.ExecuteQuery(query);
+        //    if (dt != null) dgvList.DataSource = dt;
+        //}
+
         public void btnLoad_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_host) || string.IsNullOrEmpty(_username)) return;
+
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+
             string query = "";
             string loai = cboType.SelectedItem?.ToString();
-            if (loai == "User") query = "SELECT USERNAME, ACCOUNT_STATUS, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N' ORDER BY CREATED DESC";
-            else if (loai == "Role") query = "SELECT ROLE, ROLE_ID, PASSWORD_REQUIRED FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N' ORDER BY ROLE_ID DESC";
+
+            if (loai == "User")
+            {
+                // CHỈ lấy User, lọc bỏ các Schema hệ thống
+                query = "SELECT USERNAME as NAME, ACCOUNT_STATUS as STATUS, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N' ORDER BY CREATED DESC";
+            }
+            else if (loai == "Role")
+            {
+                // CHỈ lấy Role
+                query = "SELECT ROLE as NAME, 'N/A' as STATUS, PASSWORD_REQUIRED FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N' ORDER BY ROLE ASC";
+            }
+            else // Trường hợp "Tất cả"
+            {
+                // Dùng UNION để hiện cả 2 loại trên cùng một danh sách
+                query = @"
+            SELECT USERNAME as NAME, 'USER' as TYPE, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N'
+            UNION ALL
+            SELECT ROLE as NAME, 'ROLE' as TYPE, TO_DATE(NULL) FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'
+            ORDER BY 1 ASC";
+            }
 
             DataTable dt = db.ExecuteQuery(query);
-            if (dt != null) dgvList.DataSource = dt;
+            dgvList.DataSource = null; // Xóa sạch dữ liệu cũ để tránh lỗi cột
+            if (dt != null)
+            {
+                dgvList.DataSource = dt;
+                dgvList.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            }
         }
 
         public void btnCreate_Click(object sender, EventArgs e)
