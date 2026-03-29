@@ -64,21 +64,52 @@ namespace OracleSecurityAdmin
             if (loai == "User")
             {
                 // CHỈ lấy User, lọc bỏ các Schema hệ thống
-                query = "SELECT USERNAME as NAME, ACCOUNT_STATUS as STATUS, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N' ORDER BY CREATED DESC";
-            }
+                query = @"
+                    SELECT 
+                        u.USERNAME as ""NAME"", 
+                        CASE 
+                            WHEN (SELECT COUNT(*) FROM DBA_SYS_PRIVS s WHERE s.GRANTEE = u.USERNAME AND s.PRIVILEGE = 'CREATE SESSION') > 0 
+                            THEN 'ON' 
+                            ELSE 'OFF' 
+                        END as ""STATUS"", 
+                        u.ACCOUNT_STATUS as ""ACCOUNT_INFO"",
+                        u.CREATED 
+                    FROM DBA_USERS u 
+                    WHERE u.ORACLE_MAINTAINED = 'N' 
+                    ORDER BY u.CREATED DESC";
+                //query = "SELECT USERNAME as NAME, ACCOUNT_STATUS as STATUS, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N' ORDER BY CREATED DESC";
+            }   
             else if (loai == "Role")
             {
                 // CHỈ lấy Role
-                query = "SELECT ROLE as NAME, 'N/A' as STATUS, PASSWORD_REQUIRED FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N' ORDER BY ROLE ASC";
+                query = @"
+                    SELECT 
+                        ROLE as ""NAME"", 
+                        'VALID' as ""STATUS"", 
+                        PASSWORD_REQUIRED as ""AUTH_TYPE""
+                    FROM DBA_ROLES 
+                    WHERE ORACLE_MAINTAINED = 'N' 
+                    ORDER BY ROLE ASC";
+                //query = "SELECT ROLE as NAME, 'N/A' as STATUS, PASSWORD_REQUIRED FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N' ORDER BY ROLE ASC";
             }
             else // Trường hợp "Tất cả"
             {
                 // Dùng UNION để hiện cả 2 loại trên cùng một danh sách
+                //    query = @"
+                //SELECT USERNAME as NAME, 'USER' as TYPE, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N'
+                //UNION ALL
+                //SELECT ROLE as NAME, 'ROLE' as TYPE, TO_DATE(NULL) FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'
+                //ORDER BY 1 ASC";
+
                 query = @"
-            SELECT USERNAME as NAME, 'USER' as TYPE, CREATED FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N'
-            UNION ALL
-            SELECT ROLE as NAME, 'ROLE' as TYPE, TO_DATE(NULL) FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'
-            ORDER BY 1 ASC";
+                    SELECT u.USERNAME as ""NAME"", 'USER' as ""TYPE"", 
+                           CASE WHEN (SELECT COUNT(*) FROM DBA_SYS_PRIVS s WHERE s.GRANTEE = u.USERNAME AND s.PRIVILEGE = 'CREATE SESSION') > 0 
+                           THEN 'ON' ELSE 'OFF' END as ""STATUS""
+                    FROM DBA_USERS u WHERE u.ORACLE_MAINTAINED = 'N'
+                    UNION ALL
+                    SELECT ROLE as ""NAME"", 'ROLE' as ""TYPE"", 'VALID' as ""STATUS"" 
+                    FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'
+                    ORDER BY 1 ASC";
             }
 
             DataTable dt = db.ExecuteQuery(query);
@@ -103,7 +134,14 @@ namespace OracleSecurityAdmin
 
             if (db.ExecuteNonQuery(query))
             {
-                MessageBox.Show("Thành công!");
+                if (loai == "User")
+                {
+                    // Cấp quyền kết nối cơ bản để User có thể login được ngay
+                    db.ExecuteNonQuery($"GRANT CREATE SESSION TO {ten}");
+                }
+                // -----------------------------
+
+                MessageBox.Show($"Đã tạo {loai} {ten} thành công!");
                 btnLoad_Click(null, null);
             }
         }
