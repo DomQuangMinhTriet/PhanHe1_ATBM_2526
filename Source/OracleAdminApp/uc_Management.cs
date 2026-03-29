@@ -121,62 +121,222 @@ namespace OracleSecurityAdmin
             }
         }
 
+        //public void btnCreate_Click(object sender, EventArgs e)
+        //{
+        //    string ten = GetInputText(txtTen).ToUpper();
+        //    string matKhau = GetInputText(txtMatKhau);
+        //    string loai = cboType.SelectedItem?.ToString();
+        //    if (string.IsNullOrEmpty(ten)) return;
+
+        //    DatabaseHelper db = new DatabaseHelper();
+        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+        //    string query = (loai == "User") ? $"CREATE USER {ten} IDENTIFIED BY {matKhau}" : $"CREATE ROLE {ten}";
+
+        //    if (db.ExecuteNonQuery(query))
+        //    {
+        //        if (loai == "User")
+        //        {
+        //            // Cấp quyền kết nối cơ bản để User có thể login được ngay
+        //            db.ExecuteNonQuery($"GRANT CREATE SESSION TO {ten}");
+        //        }
+        //        // -----------------------------
+
+        //        //MessageBox.Show($"Đã tạo {loai} {ten} thành công!");
+        //        MessageBox.Show($"Chúc mừng! {loai} [{ten}] đã được tạo và sẵn sàng hoạt động.",
+        //        "Hệ Thống Quản Trị",
+        //        MessageBoxButtons.OK,
+        //        MessageBoxIcon.Information);
+
+        //        btnLoad_Click(null, null);
+        //    }
+        //}
+
+
         public void btnCreate_Click(object sender, EventArgs e)
         {
             string ten = GetInputText(txtTen).ToUpper();
             string matKhau = GetInputText(txtMatKhau);
             string loai = cboType.SelectedItem?.ToString();
-            if (string.IsNullOrEmpty(ten)) return;
+
+            // VẤN ĐỀ 1: Chặn không cho tạo khi đang để "Tất cả"
+            if (loai == "Tất cả")
+            {
+                MessageBox.Show("Vui lòng chọn cụ thể loại muốn tạo là 'User' hoặc 'Role'!",
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(ten))
+            {
+                MessageBox.Show("Vui lòng nhập tên đối tượng!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-            string query = (loai == "User") ? $"CREATE USER {ten} IDENTIFIED BY {matKhau}" : $"CREATE ROLE {ten}";
+
+            string query = "";
+            if (loai == "User")
+            {
+                if (string.IsNullOrEmpty(matKhau))
+                {
+                    MessageBox.Show("User bắt buộc phải có mật khẩu!", "Thông báo");
+                    return;
+                }
+                // Bọc ngoặc kép để hỗ trợ C## và các tên có khoảng trắng
+                query = $"CREATE USER \"{ten}\" IDENTIFIED BY \"{matKhau}\"";
+            }
+            else // Trường hợp là Role
+            {
+                query = $"CREATE ROLE \"{ten}\"";
+            }
 
             if (db.ExecuteNonQuery(query))
             {
+                // Tự động cấp quyền login nếu là User
                 if (loai == "User")
                 {
-                    // Cấp quyền kết nối cơ bản để User có thể login được ngay
-                    db.ExecuteNonQuery($"GRANT CREATE SESSION TO {ten}");
+                    db.ExecuteNonQuery($"GRANT CREATE SESSION TO \"{ten}\"");
                 }
-                // -----------------------------
 
-                MessageBox.Show($"Đã tạo {loai} {ten} thành công!");
-                btnLoad_Click(null, null);
+                // VẤN ĐỀ 2: Fix lại câu thông báo cho khớp với loại đã chọn
+                MessageBox.Show($"Đã tạo thành công {loai}: {ten}",
+                                "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                btnLoad_Click(null, null); // Load lại danh sách để thấy cái mới nhất ở dòng 1
             }
         }
 
+        //public void btnDelete_Click(object sender, EventArgs e)
+        //{
+        //    string ten = GetInputText(txtTen).ToUpper();
+        //    string loai = cboType.SelectedItem?.ToString();
+        //    if (string.IsNullOrEmpty(ten)) return;
+
+        //    DialogResult result = MessageBox.Show(
+        //        $"Bạn có chắc chắn muốn xóa {loai} [{ten}] không?",
+        //        "Xác nhận xóa",
+        //        MessageBoxButtons.YesNo,
+        //        MessageBoxIcon.Question
+        //    );
+
+        //    if (result == DialogResult.No) return;
+
+        //    DatabaseHelper db = new DatabaseHelper();
+        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+        //    string query = loai == "User" ? $"DROP USER {ten} CASCADE" : $"DROP ROLE {ten}";
+
+        //    if (db.ExecuteNonQuery(query)) btnLoad_Click(null, null);
+        //}
+
         public void btnDelete_Click(object sender, EventArgs e)
         {
-            string ten = GetInputText(txtTen).ToUpper();
-            string loai = cboType.SelectedItem?.ToString();
+            if (dgvList.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn User hoặc Role cần xóa trong danh sách!", "Thông báo");
+                return;
+            }
+
+            // 1. Lấy Tên và Loại thực tế từ dòng đang chọn trên DataGridView
+            string ten = dgvList.CurrentRow.Cells["NAME"].Value?.ToString();
+
+            // Mẹo: Nếu đang ở chế độ "Tất cả" thì lấy từ cột TYPE, nếu không thì lấy từ ComboBox
+            string loaiThucTe = "";
+            if (dgvList.Columns.Contains("TYPE"))
+            {
+                loaiThucTe = dgvList.CurrentRow.Cells["TYPE"].Value?.ToString().ToUpper(); // Trả về 'USER' hoặc 'ROLE'
+            }
+            else
+            {
+                loaiThucTe = cboType.SelectedItem.ToString().ToUpper();
+            }
+
             if (string.IsNullOrEmpty(ten)) return;
 
+            // 2. Hiện thông báo xác nhận "xịn" như đã bàn
             DialogResult result = MessageBox.Show(
-                $"Bạn có chắc chắn muốn xóa {loai} [{ten}] không?",
-                "Xác nhận xóa",
+                $"CẢNH BÁO: Bạn có chắc chắn muốn xóa {loaiThucTe} [{ten}] không?\nToàn bộ quyền và dữ liệu liên quan sẽ bị mất!",
+                "Xác nhận xóa đối tượng",
                 MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question
+                MessageBoxIcon.Warning
             );
 
             if (result == DialogResult.No) return;
 
+            // 3. Thực thi SQL dựa trên loại thực tế
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-            string query = loai == "User" ? $"DROP USER {ten} CASCADE" : $"DROP ROLE {ten}";
 
-            if (db.ExecuteNonQuery(query)) btnLoad_Click(null, null);
+            // Bọc tên trong dấu ngoặc kép để tránh lỗi nếu tên có ký tự đặc biệt (như C##)
+            string query = (loaiThucTe == "USER" || loaiThucTe == "User")
+                           ? $"DROP USER \"{ten}\" CASCADE"
+                           : $"DROP ROLE \"{ten}\"";
+
+            if (db.ExecuteNonQuery(query))
+            {
+                MessageBox.Show($"Đã xóa thành công {loaiThucTe} [{ten}].", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                btnLoad_Click(null, null); // Load lại danh sách
+            }
         }
+
+        //public void btnUpdate_Click(object sender, EventArgs e)
+        //{
+        //    string ten = GetInputText(txtTen).ToUpper();
+        //    string matKhau = GetInputText(txtMatKhau);
+        //    string loai = cboType.SelectedItem?.ToString();
+        //    DatabaseHelper db = new DatabaseHelper();
+        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+        //    string query = (loai == "User") ? $"ALTER USER {ten} IDENTIFIED BY {matKhau}" : $"ALTER ROLE {ten} IDENTIFIED BY {matKhau}";
+        //    if (db.ExecuteNonQuery(query)) MessageBox.Show("Cập nhật thành công!");
+        //}
 
         public void btnUpdate_Click(object sender, EventArgs e)
         {
-            string ten = GetInputText(txtTen).ToUpper();
-            string matKhau = GetInputText(txtMatKhau);
-            string loai = cboType.SelectedItem?.ToString();
+            if (dgvList.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn User hoặc Role cần cập nhật từ danh sách!", "Thông báo");
+                return;
+            }
+
+            // 1. Lấy Tên, Mật khẩu mới và Loại thực tế từ dòng đang chọn
+            string ten = dgvList.CurrentRow.Cells["NAME"].Value?.ToString();
+            string matKhauMoi = GetInputText(txtMatKhau);
+
+            // Xác định loại dựa trên cột TYPE (nếu đang ở chế độ 'Tất cả') hoặc ComboBox
+            string loaiThucTe = "";
+            if (dgvList.Columns.Contains("TYPE"))
+            {
+                loaiThucTe = dgvList.CurrentRow.Cells["TYPE"].Value?.ToString().ToUpper();
+            }
+            else
+            {
+                loaiThucTe = cboType.SelectedItem.ToString().ToUpper();
+            }
+
+            if (string.IsNullOrEmpty(ten) || string.IsNullOrEmpty(matKhauMoi))
+            {
+                MessageBox.Show("Vui lòng nhập mật khẩu mới cần thay đổi!", "Thông báo");
+                return;
+            }
+
+            // 2. Thực thi SQL
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-            string query = (loai == "User") ? $"ALTER USER {ten} IDENTIFIED BY {matKhau}" : $"ALTER ROLE {ten} IDENTIFIED BY {matKhau}";
-            if (db.ExecuteNonQuery(query)) MessageBox.Show("Cập nhật thành công!");
+
+            // Câu lệnh SQL linh hoạt: ALTER USER hoặc ALTER ROLE
+            string query = (loaiThucTe == "USER" || loaiThucTe == "User")
+                           ? $"ALTER USER \"{ten}\" IDENTIFIED BY \"{matKhauMoi}\""
+                           : $"ALTER ROLE \"{ten}\" IDENTIFIED BY \"{matKhauMoi}\"";
+
+            if (db.ExecuteNonQuery(query))
+            {
+                MessageBox.Show($"Đã cập nhật mật khẩu thành công cho {loaiThucTe} [{ten}].",
+                                "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Dọn dẹp ô mật khẩu sau khi đổi xong cho sạch sẽ
+                txtMatKhau.Clear();
+                btnLoad_Click(null, null);
+            }
         }
 
         public void btnLogout_Click(object sender, EventArgs e) { Application.Restart(); }
