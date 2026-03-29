@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Odbc;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -37,58 +38,132 @@ namespace OracleSecurityAdmin
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
 
+            //string sql = @"
+            //    SELECT p.GRANTEE, p.PRIVILEGE, p.OWNER, p.TABLE_NAME, 
+            //           'ALL' as COLUMN_NAME, o.CREATED, o.OBJECT_TYPE, '' as REAL_VIEW_NAME
+            //    FROM DBA_TAB_PRIVS p 
+            //    JOIN DBA_OBJECTS o ON p.OWNER = o.OWNER AND p.TABLE_NAME = o.OBJECT_NAME
+            //    WHERE p.OWNER NOT IN ('SYS','SYSTEM','DBSNMP','OUTLN')
+            //      AND (p.GRANTEE IN (SELECT USERNAME FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N')
+            //           OR p.GRANTEE IN (SELECT ROLE FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'))
+            //    UNION ALL
+            //    SELECT cp.GRANTEE, cp.PRIVILEGE, cp.OWNER, cp.TABLE_NAME, 
+            //           cp.COLUMN_NAME, o.CREATED, 'COLUMN_NATIVE', ''
+            //    FROM DBA_COL_PRIVS cp 
+            //    JOIN DBA_OBJECTS o ON cp.OWNER = o.OWNER AND cp.TABLE_NAME = o.OBJECT_NAME
+            //    ORDER BY 6 DESC";
+
             string sql = @"
-                SELECT p.GRANTEE, p.PRIVILEGE, p.OWNER, p.TABLE_NAME, 
-                       'ALL' as COLUMN_NAME, o.CREATED, o.OBJECT_TYPE, '' as REAL_VIEW_NAME
+                SELECT p.GRANTEE, p.GRANTOR,
+                       (CASE WHEN u.USERNAME IS NOT NULL THEN 'USER' ELSE 'ROLE' END) as GTYPE,
+                       p.PRIVILEGE, p.OWNER, p.TABLE_NAME, 'ALL' as COLUMN_NAME, p.GRANTABLE, o.OBJECT_TYPE
                 FROM DBA_TAB_PRIVS p 
                 JOIN DBA_OBJECTS o ON p.OWNER = o.OWNER AND p.TABLE_NAME = o.OBJECT_NAME
+                LEFT JOIN DBA_USERS u ON p.GRANTEE = u.USERNAME
                 WHERE p.OWNER NOT IN ('SYS','SYSTEM','DBSNMP','OUTLN')
                   AND (p.GRANTEE IN (SELECT USERNAME FROM DBA_USERS WHERE ORACLE_MAINTAINED = 'N')
                        OR p.GRANTEE IN (SELECT ROLE FROM DBA_ROLES WHERE ORACLE_MAINTAINED = 'N'))
                 UNION ALL
-                SELECT cp.GRANTEE, cp.PRIVILEGE, cp.OWNER, cp.TABLE_NAME, 
-                       cp.COLUMN_NAME, o.CREATED, 'COLUMN_NATIVE', ''
+                SELECT cp.GRANTEE, cp.GRANTOR,
+                       (CASE WHEN u2.USERNAME IS NOT NULL THEN 'USER' ELSE 'ROLE' END) as GTYPE,
+                       cp.PRIVILEGE, cp.OWNER, cp.TABLE_NAME, cp.COLUMN_NAME, cp.GRANTABLE, 'COLUMN_NATIVE' as OBJECT_TYPE
                 FROM DBA_COL_PRIVS cp 
-                JOIN DBA_OBJECTS o ON cp.OWNER = o.OWNER AND cp.TABLE_NAME = o.OBJECT_NAME
-                ORDER BY 6 DESC";
+                LEFT JOIN DBA_USERS u2 ON cp.GRANTEE = u2.USERNAME
+                WHERE cp.OWNER NOT IN ('SYS','SYSTEM','DBSNMP','OUTLN')
+                ORDER BY 1 ASC";
 
             DataTable dtRaw = db.ExecuteQuery(sql);
             DataTable dtDisplay = new DataTable();
+
             dtDisplay.Columns.Add("Người nhận (User/Role)");
+            dtDisplay.Columns.Add("Người cấp");
+            dtDisplay.Columns.Add("Loại");
             dtDisplay.Columns.Add("Quyền");
             dtDisplay.Columns.Add("Đối tượng");
             dtDisplay.Columns.Add("Cột cụ thể");
+            dtDisplay.Columns.Add("Cấp tiếp?");
             dtDisplay.Columns.Add("FULL_OBJ_PATH");
             dtDisplay.Columns.Add("IS_VIEW_SEC");
 
+
+
             foreach (DataRow row in dtRaw.Rows)
             {
+                // Lấy thêm các thông tin mới từ câu SQL (Grantor, GType, Grantable)
                 string grantee = row["GRANTEE"].ToString();
+                string grantor = row["GRANTOR"].ToString();    // MỚI
+                string gType = row["GTYPE"].ToString();        // MỚI
                 string priv = row["PRIVILEGE"].ToString();
                 string owner = row["OWNER"].ToString();
                 string tableName = row["TABLE_NAME"].ToString();
                 string col = row["COLUMN_NAME"].ToString();
+                string grantable = row["GRANTABLE"].ToString(); // MỚI
                 string objType = row["OBJECT_TYPE"].ToString();
 
                 if (objType == "VIEW" && tableName.StartsWith("V_SEC_"))
                 {
-                    string[] parts = tableName.Split('_');
-                    string originalTable = parts.Length >= 3 ? parts[2] : tableName;
+                    // Logic cắt chuỗi để lấy tên bảng gốc (đã fix lỗi _TEST)
+                    string temp = tableName.Substring(6);
+                    string granteeClean = grantee.Replace("#", "");
+                    string originalTable = temp;
+                    if (temp.EndsWith("_" + granteeClean))
+                    {
+                        originalTable = temp.Substring(0, temp.Length - (granteeClean.Length + 1));
+                    }
 
+                    // LOAD CỘT THỰC TẾ TỪ VIEW
                     DataTable dtCols = db.ExecuteQuery($"SELECT COLUMN_NAME FROM DBA_TAB_COLS WHERE OWNER = '{owner}' AND TABLE_NAME = '{tableName}'");
                     foreach (DataRow rCol in dtCols.Rows)
                     {
-                        dtDisplay.Rows.Add(grantee, "SELECT (Column)", owner + "." + originalTable, rCol["COLUMN_NAME"], owner + "." + tableName, "YES");
+                        // THỨ TỰ THÊM PHẢI CHUẨN: Người nhận -> Người cấp -> Loại -> Quyền -> Đối tượng -> Cột -> Cấp tiếp -> Path -> IsView
+                        dtDisplay.Rows.Add(
+                            grantee,
+                            grantor,
+                            gType,
+                            "SELECT (Column)",
+                            owner + "." + originalTable,
+                            rCol["COLUMN_NAME"],
+                            grantable,
+                            owner + "." + tableName,
+                            "YES"
+                        );
                     }
                 }
                 else
                 {
-                    dtDisplay.Rows.Add(grantee, priv, owner + "." + tableName, col, owner + "." + tableName, "NO");
+                    // DÀNH CHO CÁC QUYỀN TRÊN BẢNG HOẶC UPDATE CỘT THÔNG THƯỜNG
+                    dtDisplay.Rows.Add(
+                        grantee,
+                        grantor,
+                        gType,
+                        priv,
+                        owner + "." + tableName,
+                        col,
+                        grantable,
+                        owner + "." + tableName,
+                        "NO"
+                    );
                 }
             }
 
             _allPrivs = dtDisplay;
             dgvPrivs.DataSource = dtDisplay;
+
+            if (dgvPrivs.Columns.Contains("Loại"))
+                dgvPrivs.Columns["Loại"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            if (dgvPrivs.Columns.Contains("Cấp tiếp?"))
+            {
+                dgvPrivs.Columns["Cấp tiếp?"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                foreach (DataGridViewRow r in dgvPrivs.Rows)
+                {
+                    if (r.Cells["Cấp tiếp?"].Value?.ToString() == "YES")
+                    {
+                        r.Cells["Cấp tiếp?"].Style.ForeColor = Color.DarkGreen;
+                        r.Cells["Cấp tiếp?"].Style.Font = new Font(dgvPrivs.Font, FontStyle.Bold);
+                    }
+                }
+            }
 
             if (dgvPrivs.Columns.Contains("FULL_OBJ_PATH")) dgvPrivs.Columns["FULL_OBJ_PATH"].Visible = false;
             if (dgvPrivs.Columns.Contains("IS_VIEW_SEC")) dgvPrivs.Columns["IS_VIEW_SEC"].Visible = false;
@@ -121,6 +196,7 @@ namespace OracleSecurityAdmin
                     {
                         string newList = "";
                         foreach (DataRow r in dtRemain.Rows) newList += r["COLUMN_NAME"].ToString() + ",";
+                        //db.ExecuteNonQuery($"CREATE OR REPLACE VIEW {techPath} AS SELECT {newList.TrimEnd(',')} FROM {originalObjPath}");
                         db.ExecuteNonQuery($"CREATE OR REPLACE VIEW {techPath} AS SELECT {newList.TrimEnd(',')} FROM {originalObjPath}");
                         MessageBox.Show("Đã xóa cột khỏi quyền SELECT.");
                     }

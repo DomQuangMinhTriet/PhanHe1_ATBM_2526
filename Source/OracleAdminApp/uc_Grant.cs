@@ -22,6 +22,16 @@ namespace OracleSecurityAdmin
 
         private void uc_Grant_Load(object sender, EventArgs e)
         {
+            cboGrantee.DropDownStyle = ComboBoxStyle.DropDown;
+            cboObjectName.DropDownStyle = ComboBoxStyle.DropDown;
+
+           
+            cboGrantee.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboGrantee.AutoCompleteSource = AutoCompleteSource.ListItems;
+
+            cboObjectName.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            cboObjectName.AutoCompleteSource = AutoCompleteSource.ListItems;
+
             cboGranteeType.SelectedIndex = 0;
             cboObjectType.SelectedIndex = 0;
         }
@@ -77,10 +87,67 @@ namespace OracleSecurityAdmin
                 _memory[priv].Remove(colName);
         }
 
+        //private void btnGrant_Click(object sender, EventArgs e)
+        //{
+        //    string grantee = cboGrantee.Text;
+        //    string fullObj = cboObjectName.Text;
+        //    string objNameOnly = fullObj.Contains(".") ? fullObj.Split('.')[1] : fullObj;
+
+        //    string grantOpt = chkWithGrantOption.Checked
+        //        ? (cboObjectType.Text == "ROLE" ? " WITH ADMIN OPTION" : " WITH GRANT OPTION")
+        //        : "";
+
+        //    DatabaseHelper db = new DatabaseHelper();
+        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+
+        //    if (clbPrivs.CheckedItems.Count == 0) { MessageBox.Show("Chọn ít nhất 1 quyền!"); return; }
+
+        //    try
+        //    {
+        //        foreach (string priv in clbPrivs.CheckedItems)
+        //        {
+        //            bool hasColumns = _memory.ContainsKey(priv) && _memory[priv].Count > 0;
+        //            string sql = "";
+
+        //            if (priv == "SELECT" && hasColumns)
+        //            {
+        //                string columnList = string.Join(", ", _memory[priv]);
+        //                string viewName = $"V_SEC_{objNameOnly}_{grantee.Replace("#", "")}";
+
+        //                string createViewSql = $"CREATE OR REPLACE VIEW {viewName} AS SELECT {columnList} FROM {fullObj}";
+        //                db.ExecuteNonQuery(createViewSql);
+
+        //                sql = $"GRANT SELECT ON {viewName} TO {grantee}{grantOpt}";
+        //            }
+        //            else if (priv == "UPDATE" && hasColumns)
+        //            {
+        //                string columnList = string.Join(", ", _memory[priv]);
+        //                sql = $"GRANT UPDATE({columnList}) ON {fullObj} TO {grantee}{grantOpt}";
+        //            }
+        //            else
+        //            {
+        //                sql = $"GRANT {priv} ON {fullObj} TO {grantee}{grantOpt}";
+        //            }
+
+        //            db.ExecuteNonQuery(sql);
+        //        }
+        //        MessageBox.Show("Cấp quyền thành công! Đã áp dụng chính sách bảo mật cho các cột được chọn.",
+        //        "Thông báo",
+        //        MessageBoxButtons.OK,
+        //        MessageBoxIcon.Information);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show("Lỗi trong quá trình cấp quyền: " + ex.Message);
+        //    }
+        //}
+
         private void btnGrant_Click(object sender, EventArgs e)
         {
             string grantee = cboGrantee.Text;
             string fullObj = cboObjectName.Text;
+            if (string.IsNullOrEmpty(grantee) || string.IsNullOrEmpty(fullObj)) return; // Tránh lỗi rỗng
+
             string objNameOnly = fullObj.Contains(".") ? fullObj.Split('.')[1] : fullObj;
 
             string grantOpt = chkWithGrantOption.Checked
@@ -90,7 +157,11 @@ namespace OracleSecurityAdmin
             DatabaseHelper db = new DatabaseHelper();
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
 
-            if (clbPrivs.CheckedItems.Count == 0) { MessageBox.Show("Chọn ít nhất 1 quyền!"); return; }
+            if (clbPrivs.CheckedItems.Count == 0) { MessageBox.Show("Vui lòng chọn ít nhất 1 quyền!"); return; }
+
+            // --- 2 DANH SÁCH ĐỂ THEO DÕI KẾT QUẢ THỰC TẾ ---
+            List<string> successList = new List<string>();
+            List<string> failList = new List<string>();
 
             try
             {
@@ -98,6 +169,7 @@ namespace OracleSecurityAdmin
                 {
                     bool hasColumns = _memory.ContainsKey(priv) && _memory[priv].Count > 0;
                     string sql = "";
+                    bool isSuccess = false;
 
                     if (priv == "SELECT" && hasColumns)
                     {
@@ -105,27 +177,47 @@ namespace OracleSecurityAdmin
                         string viewName = $"V_SEC_{objNameOnly}_{grantee.Replace("#", "")}";
 
                         string createViewSql = $"CREATE OR REPLACE VIEW {viewName} AS SELECT {columnList} FROM {fullObj}";
-                        db.ExecuteNonQuery(createViewSql);
 
-                        sql = $"GRANT SELECT ON {viewName} TO {grantee}{grantOpt}";
+                        // Phải tạo View thành công thì mới đi Grant
+                        if (db.ExecuteNonQuery(createViewSql))
+                        {
+                            sql = $"GRANT SELECT ON {viewName} TO \"{grantee}\"{grantOpt}";
+                            isSuccess = db.ExecuteNonQuery(sql);
+                        }
                     }
                     else if (priv == "UPDATE" && hasColumns)
                     {
                         string columnList = string.Join(", ", _memory[priv]);
-                        sql = $"GRANT UPDATE({columnList}) ON {fullObj} TO {grantee}{grantOpt}";
+                        sql = $"GRANT UPDATE({columnList}) ON {fullObj} TO \"{grantee}\"{grantOpt}";
+                        isSuccess = db.ExecuteNonQuery(sql);
                     }
                     else
                     {
-                        sql = $"GRANT {priv} ON {fullObj} TO {grantee}{grantOpt}";
+                        sql = $"GRANT {priv} ON {fullObj} TO \"{grantee}\"{grantOpt}";
+                        isSuccess = db.ExecuteNonQuery(sql);
                     }
 
-                    db.ExecuteNonQuery(sql);
+                    // KIỂM TRA KẾT QUẢ TỪNG LỆNH
+                    if (isSuccess) successList.Add(priv);
+                    else failList.Add(priv);
                 }
-                MessageBox.Show("Đã thực hiện cấp quyền (bao gồm tạo View bảo mật nếu có SELECT cột) thành công!");
+
+                // --- HIỂN THỊ THÔNG BÁO DỰA TRÊN KẾT QUẢ THẬT ---
+                string resultMsg = "";
+                if (successList.Count > 0)
+                    resultMsg += $"✅ Thành công: {string.Join(", ", successList)}\n";
+
+                
+
+                if (successList.Count > 0)
+                {
+                    MessageBox.Show(resultMsg, "Kết quả thực thi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi trong quá trình cấp quyền: " + ex.Message);
+                MessageBox.Show("Lỗi hệ thống: " + ex.Message);
             }
         }
 
@@ -138,6 +230,8 @@ namespace OracleSecurityAdmin
             DataTable dt = db.ExecuteQuery(q);
             cboGrantee.Items.Clear();
             if (dt != null) foreach (DataRow r in dt.Rows) cboGrantee.Items.Add(r["NAME"].ToString());
+
+
         }
 
         private void cboObjectType_SelectedIndexChanged(object sender, EventArgs e)
@@ -167,6 +261,57 @@ namespace OracleSecurityAdmin
             db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
             DataTable dt = db.ExecuteQuery($"SELECT COLUMN_NAME FROM DBA_TAB_COLS WHERE OWNER = '{p[0]}' AND TABLE_NAME = '{p[1]}'");
             if (dt != null) foreach (DataRow r in dt.Rows) clbColumns.Items.Add(r["COLUMN_NAME"].ToString());
+
+            LoadExistingPrivs();
+        }
+
+        private void LoadExistingPrivs()
+        {
+            string grantee = cboGrantee.Text.ToUpper();
+            string fullObj = cboObjectName.Text.ToUpper();
+
+            if (string.IsNullOrEmpty(grantee) || !fullObj.Contains(".")) return;
+
+            string[] parts = fullObj.Split('.');
+            string owner = parts[0];
+            string tableName = parts[1];
+
+            DatabaseHelper db = new DatabaseHelper();
+            db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
+
+            // 1. Reset toàn bộ CheckedListBox về trạng thái chưa chọn
+            for (int i = 0; i < clbPrivs.Items.Count; i++)
+            {
+                clbPrivs.SetItemChecked(i, false);
+            }
+
+            // 2. Query lấy các quyền hệ thống đã cấp (Table-level)
+            string sql = $@"SELECT PRIVILEGE FROM DBA_TAB_PRIVS 
+                    WHERE GRANTEE = '{grantee}' 
+                    AND OWNER = '{owner}' 
+                    AND TABLE_NAME = '{tableName}'";
+
+            DataTable dt = db.ExecuteQuery(sql);
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow row in dt.Rows)
+                {
+                    string priv = row["PRIVILEGE"].ToString();
+                    // Nếu tìm thấy quyền (SELECT, INSERT...), tự động tích chọn
+                    for (int i = 0; i < clbPrivs.Items.Count; i++)
+                    {
+                        if (clbPrivs.Items[i].ToString() == priv)
+                        {
+                            clbPrivs.SetItemChecked(i, true);
+                        }
+                    }
+                }
+            }
         }
     }
+
 }
+
+
+

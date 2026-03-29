@@ -121,35 +121,7 @@ namespace OracleSecurityAdmin
             }
         }
 
-        //public void btnCreate_Click(object sender, EventArgs e)
-        //{
-        //    string ten = GetInputText(txtTen).ToUpper();
-        //    string matKhau = GetInputText(txtMatKhau);
-        //    string loai = cboType.SelectedItem?.ToString();
-        //    if (string.IsNullOrEmpty(ten)) return;
 
-        //    DatabaseHelper db = new DatabaseHelper();
-        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-        //    string query = (loai == "User") ? $"CREATE USER {ten} IDENTIFIED BY {matKhau}" : $"CREATE ROLE {ten}";
-
-        //    if (db.ExecuteNonQuery(query))
-        //    {
-        //        if (loai == "User")
-        //        {
-        //            // Cấp quyền kết nối cơ bản để User có thể login được ngay
-        //            db.ExecuteNonQuery($"GRANT CREATE SESSION TO {ten}");
-        //        }
-        //        // -----------------------------
-
-        //        //MessageBox.Show($"Đã tạo {loai} {ten} thành công!");
-        //        MessageBox.Show($"Chúc mừng! {loai} [{ten}] đã được tạo và sẵn sàng hoạt động.",
-        //        "Hệ Thống Quản Trị",
-        //        MessageBoxButtons.OK,
-        //        MessageBoxIcon.Information);
-
-        //        btnLoad_Click(null, null);
-        //    }
-        //}
 
 
         public void btnCreate_Click(object sender, EventArgs e)
@@ -207,27 +179,7 @@ namespace OracleSecurityAdmin
             }
         }
 
-        //public void btnDelete_Click(object sender, EventArgs e)
-        //{
-        //    string ten = GetInputText(txtTen).ToUpper();
-        //    string loai = cboType.SelectedItem?.ToString();
-        //    if (string.IsNullOrEmpty(ten)) return;
-
-        //    DialogResult result = MessageBox.Show(
-        //        $"Bạn có chắc chắn muốn xóa {loai} [{ten}] không?",
-        //        "Xác nhận xóa",
-        //        MessageBoxButtons.YesNo,
-        //        MessageBoxIcon.Question
-        //    );
-
-        //    if (result == DialogResult.No) return;
-
-        //    DatabaseHelper db = new DatabaseHelper();
-        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-        //    string query = loai == "User" ? $"DROP USER {ten} CASCADE" : $"DROP ROLE {ten}";
-
-        //    if (db.ExecuteNonQuery(query)) btnLoad_Click(null, null);
-        //}
+    
 
         public void btnDelete_Click(object sender, EventArgs e)
         {
@@ -279,16 +231,7 @@ namespace OracleSecurityAdmin
             }
         }
 
-        //public void btnUpdate_Click(object sender, EventArgs e)
-        //{
-        //    string ten = GetInputText(txtTen).ToUpper();
-        //    string matKhau = GetInputText(txtMatKhau);
-        //    string loai = cboType.SelectedItem?.ToString();
-        //    DatabaseHelper db = new DatabaseHelper();
-        //    db.BuildConnectionString(_host, _port, _serviceName, _username, _password, false);
-        //    string query = (loai == "User") ? $"ALTER USER {ten} IDENTIFIED BY {matKhau}" : $"ALTER ROLE {ten} IDENTIFIED BY {matKhau}";
-        //    if (db.ExecuteNonQuery(query)) MessageBox.Show("Cập nhật thành công!");
-        //}
+    
 
         public void btnUpdate_Click(object sender, EventArgs e)
         {
